@@ -1,0 +1,26 @@
+{
+  "upstream": "https://github.com/agegr/pi-web.git",
+  "upstream_commit": "0d1d0d1a36dd8a4ead77648ad2fc18e2b1291e55",
+  "upstream_ref": "main",
+  "upstream_version_hint": "0.8.0",
+  "locale": "zh-CN",
+  "overlay_strategy": "copy-overlay-first-with-patch-fallback",
+  "files": [
+    "app/layout.tsx",
+    "components/AppShell.tsx",
+    "components/BranchNavigator.tsx",
+    "components/ChatInput.tsx",
+    "components/ChatWindow.tsx",
+    "components/FileExplorer.tsx",
+    "components/FileViewer.tsx",
+    "components/MarkdownBody.tsx",
+    "components/MessageView.tsx",
+    "components/ModelsConfig.tsx",
+    "components/PluginsConfig.tsx",
+    "components/SessionSidebar.tsx",
+    "components/SkillsConfig.tsx",
+    "components/TabBar.tsx",
+    "hooks/useAgentSession.ts",
+    "lib/i18n.ts"
+  ]
+}

@@ -1,0 +1,3843 @@
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 0bd163a..d002bab 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -11,7 +11,7 @@ const notoSansMono = Noto_Sans_Mono({
+ 
+ export const metadata: Metadata = {
+   title: "Pi Web",
+-  description: "Pi Web interface for the pi coding agent",
++  description: "pi 编程智能体的 Web 界面",
+ };
+ 
+ export default function RootLayout({
+@@ -20,7 +20,7 @@ export default function RootLayout({
+   children: React.ReactNode;
+ }) {
+   return (
+-    <html lang="en" translate="no" className={`${notoSansMono.variable} notranslate`} suppressHydrationWarning>
++    <html lang="zh-CN" translate="no" className={`${notoSansMono.variable} notranslate`} suppressHydrationWarning>
+       <head>
+         <meta name="google" content="notranslate" />
+         <script
+diff --git a/components/AppShell.tsx b/components/AppShell.tsx
+index 90ab0c8..d9d7862 100644
+--- a/components/AppShell.tsx
++++ b/components/AppShell.tsx
+@@ -20,6 +20,7 @@ import { getInitialNavigation } from "@/lib/initial-navigation";
+ import type { SessionInfo, SessionTreeNode } from "@/lib/types";
+ import type { ChatInputHandle } from "./ChatInput";
+ import type { SessionStatsInfo } from "@/lib/pi-types";
++import { t } from "@/lib/i18n";
+ 
+ type SessionCopyField = "file" | "id";
+ type AutoNameStatus =
+@@ -455,7 +456,7 @@ export function AppShell() {
+       <div style={{ padding: "8px", flexShrink: 0, display: "flex", justifyContent: "space-between", gap: 4 }}>
+         {([
+           {
+-            label: "Models",
++            label: t("Models"),
+             onClick: () => setModelsConfigOpen(true),
+             disabled: false,
+             icon: (
+@@ -469,7 +470,7 @@ export function AppShell() {
+             ),
+           },
+           {
+-            label: "Skills",
++            label: t("Skills"),
+             onClick: () => setSkillsConfigOpen(true),
+             disabled: !activeCwd && !selectedSession?.cwd && !newSessionCwd,
+             icon: (
+@@ -481,7 +482,7 @@ export function AppShell() {
+             ),
+           },
+           {
+-            label: "Plugins",
++            label: t("Plugins"),
+             onClick: () => setPluginsConfigOpen(true),
+             disabled: !activeCwd && !selectedSession?.cwd && !newSessionCwd,
+             icon: (
+@@ -627,8 +628,8 @@ export function AppShell() {
+         <div ref={topBarRef} style={{ display: "flex", alignItems: "center", flexShrink: 0, borderBottom: "1px solid var(--border)", height: 36, background: "var(--bg-panel)" }}>
+           <button
+             onClick={handleSidebarToggle}
+-            title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+-            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
++            title={sidebarOpen ? t("Hide sidebar") : t("Show sidebar")}
++            aria-label={sidebarOpen ? t("Hide sidebar") : t("Show sidebar")}
+             style={{
+               display: "flex", alignItems: "center", justifyContent: "center",
+               width: 36, height: 36, padding: 0,
+@@ -653,8 +654,8 @@ export function AppShell() {
+               const rect = e.currentTarget.getBoundingClientRect();
+               toggleTheme({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+             }}
+-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
++            title={isDark ? t("Switch to light mode") : t("Switch to dark mode")}
++            aria-label={isDark ? t("Switch to light mode") : t("Switch to dark mode")}
+             aria-pressed={isDark}
+             style={{
+               display: "flex", alignItems: "center", justifyContent: "center",
+@@ -684,8 +685,8 @@ export function AppShell() {
+               <button
+                 onClick={handleViewFullHistory}
+                 disabled={!selectedSession}
+-                title={selectedSession ? "View full history" : "Full history is available after the session is saved"}
+-                aria-label="View full history"
++                title={selectedSession ? t("View full history") : t("Full history is available after the session is saved")}
++                aria-label={t("View full history")}
+                 style={{
+                   display: "flex",
+                   alignItems: "center",
+@@ -732,7 +733,7 @@ export function AppShell() {
+                   <path d="M3 3v5h5" />
+                   <path d="M12 7v5l3 2" />
+                 </svg>
+-                {!isMobile && <span>Full history</span>}
++                {!isMobile && <span>{t("Full history")}</span>}
+               </button>
+               {(() => {
+                 const hasMessages = Boolean(
+@@ -743,19 +744,19 @@ export function AppShell() {
+                 const isSuccess = autoNameStatus.kind === "success";
+                 const isError = autoNameStatus.kind === "error";
+                 const label = autoNameStatus.kind === "naming"
+-                  ? "Generating..."
++                  ? t("Generating...")
+                   : isSuccess
+-                    ? "Title updated"
++                    ? t("Title updated")
+                     : isError
+-                      ? "Generation failed"
+-                      : "Generate title";
++                      ? t("Generation failed")
++                      : t("Generate title");
+                 const title = !selectedSession
+-                  ? "Title generation is available after the session is saved"
++                  ? t("Title generation is available after the session is saved")
+                   : !hasMessages
+-                    ? "Send a message before naming this session"
++                    ? t("Send a message before naming this session")
+                     : isError
+                       ? autoNameStatus.message
+-                      : "Generate a session title";
++                      : t("Generate a session title");
+ 
+                 return (
+                   <button
+@@ -820,8 +821,8 @@ export function AppShell() {
+               <button
+                 ref={systemBtnRef}
+                 onClick={() => toggleTopPanel("system")}
+-                title="System prompt"
+-                aria-label="System prompt"
++                title={t("System prompt")}
++                aria-label={t("System prompt")}
+                 aria-pressed={activeTopPanel === "system"}
+                 style={{
+                   display: "flex", alignItems: "center", gap: 6,
+@@ -843,13 +844,13 @@ export function AppShell() {
+                   <line x1="8" y1="13" x2="16" y2="13" />
+                   <line x1="8" y1="17" x2="13" y2="17" />
+                 </svg>
+-                {!isMobile && <span>System</span>}
++                {!isMobile && <span>{t("System")}</span>}
+               </button>
+             </div>
+           )}
+           {/* Session stats — right-aligned in top bar */}
+           {showChat && (sessionStats || contextUsage) && (() => {
+-            const t = sessionStats?.tokens;
++            const tokens = sessionStats?.tokens;
+             const c = sessionStats?.cost ?? 0;
+             const fmt = (n: number) => n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1000 ? `${(n / 1000).toFixed(0)}k` : String(n);
+             const costStr = c > 0 ? (c >= 0.01 ? `$${c.toFixed(2)}` : `<$0.01`) : null;
+@@ -864,11 +865,11 @@ export function AppShell() {
+             }
+ 
+             const tooltipParts: string[] = [];
+-            if (t) {
+-              tooltipParts.push(`in: ${t.input.toLocaleString()}`);
+-              tooltipParts.push(`out: ${t.output.toLocaleString()}`);
+-              tooltipParts.push(`cache read: ${t.cacheRead.toLocaleString()}`);
+-              tooltipParts.push(`cache write: ${t.cacheWrite.toLocaleString()}`);
++            if (tokens) {
++              tooltipParts.push(`in: ${tokens.input.toLocaleString()}`);
++              tooltipParts.push(`out: ${tokens.output.toLocaleString()}`);
++              tooltipParts.push(`cache read: ${tokens.cacheRead.toLocaleString()}`);
++              tooltipParts.push(`cache write: ${tokens.cacheWrite.toLocaleString()}`);
+               if (c > 0) tooltipParts.push(`cost: $${c.toFixed(4)}`);
+             }
+             if (contextUsage?.contextWindow) {
+@@ -881,8 +882,8 @@ export function AppShell() {
+               <button
+                 type="button"
+                 onClick={() => toggleTopPanel("session")}
+-                title={tooltip || "Session info"}
+-                aria-label="Session info"
++                title={tooltip || t("Session info")}
++                aria-label={t("Session info")}
+                 aria-pressed={activeTopPanel === "session"}
+                 style={{
+                   marginLeft: "auto",
+@@ -906,28 +907,28 @@ export function AppShell() {
+                     <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                   </svg>
+                 )}
+-                {!isMobile && t && t.input > 0 && (
++                {!isMobile && tokens && tokens.input > 0 && (
+                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                     <svg width="12" height="12" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                       <line x1="5" y1="8.5" x2="5" y2="1.5" /><polyline points="2 4 5 1.5 8 4" />
+                     </svg>
+-                    {fmt(t.input)}
++                    {fmt(tokens.input)}
+                   </span>
+                 )}
+-                {!isMobile && t && t.output > 0 && (
++                {!isMobile && tokens && tokens.output > 0 && (
+                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                     <svg width="12" height="12" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                       <line x1="5" y1="1.5" x2="5" y2="8.5" /><polyline points="2 6 5 8.5 8 6" />
+                     </svg>
+-                    {fmt(t.output)}
++                    {fmt(tokens.output)}
+                   </span>
+                 )}
+-                {!isMobile && t && t.cacheRead > 0 && (
++                {!isMobile && tokens && tokens.cacheRead > 0 && (
+                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                     <svg width="12" height="12" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                       <path d="M8.5 5a3.5 3.5 0 1 1-1-2.45" /><polyline points="6.5 1.5 8.5 2.5 7.5 4.5" />
+                     </svg>
+-                    {fmt(t.cacheRead)}
++                    {fmt(tokens.cacheRead)}
+                   </span>
+                 )}
+                 {!isMobile && costStr && (
+@@ -977,11 +978,11 @@ export function AppShell() {
+                     </div>
+                   ) : systemPrompt === "" ? (
+                     <div style={{ padding: "10px 16px", fontSize: 12, color: "var(--text-muted)", fontStyle: "italic" }}>
+-                      System prompt is empty (tools are disabled)
++                      {t("System prompt is empty (tools are disabled)")}
+                     </div>
+                   ) : (
+                     <div style={{ padding: "10px 16px", fontSize: 12, color: "var(--text-muted)", fontStyle: "italic" }}>
+-                      Send a message to load the system prompt
++                      {t("Send a message to load the system prompt")}
+                     </div>
+                   )}
+                 </div>
+@@ -995,29 +996,29 @@ export function AppShell() {
+                 }}>
+                   {sessionStats ? (() => {
+                     const sessionRows = [
+-                      ...(sessionStats.sessionName ? [{ label: "Name", value: sessionStats.sessionName, copyField: null }] : []),
+-                      { label: "File", value: sessionStats.sessionFile ?? "In-memory", copyField: "file" as const },
+-                      { label: "ID", value: sessionStats.sessionId, copyField: "id" as const },
++                      ...(sessionStats.sessionName ? [{ label: t("Name"), value: sessionStats.sessionName, copyField: null }] : []),
++                      { label: t("File"), value: sessionStats.sessionFile ?? t("In-memory"), copyField: "file" as const },
++                      { label: t("ID"), value: sessionStats.sessionId, copyField: "id" as const },
+                     ];
+                     const messageRows = [
+-                      ["User", sessionStats.userMessages.toLocaleString()],
+-                      ["Assistant", sessionStats.assistantMessages.toLocaleString()],
+-                      ["Tool Calls", sessionStats.toolCalls.toLocaleString()],
+-                      ["Tool Results", sessionStats.toolResults.toLocaleString()],
+-                      ["Total", sessionStats.totalMessages.toLocaleString()],
++                      [t("User"), sessionStats.userMessages.toLocaleString()],
++                      [t("Assistant"), sessionStats.assistantMessages.toLocaleString()],
++                      [t("Tool Calls"), sessionStats.toolCalls.toLocaleString()],
++                      [t("Tool Results"), sessionStats.toolResults.toLocaleString()],
++                      [t("Total"), sessionStats.totalMessages.toLocaleString()],
+                     ];
+                     const tokenRows = [
+-                      ["Input", sessionStats.tokens.input.toLocaleString()],
+-                      ["Output", sessionStats.tokens.output.toLocaleString()],
+-                      ...(sessionStats.tokens.cacheRead > 0 ? [["Cache Read", sessionStats.tokens.cacheRead.toLocaleString()]] : []),
+-                      ...(sessionStats.tokens.cacheWrite > 0 ? [["Cache Write", sessionStats.tokens.cacheWrite.toLocaleString()]] : []),
+-                      ["Total", sessionStats.tokens.total.toLocaleString()],
++                      [t("Input"), sessionStats.tokens.input.toLocaleString()],
++                      [t("Output"), sessionStats.tokens.output.toLocaleString()],
++                      ...(sessionStats.tokens.cacheRead > 0 ? [[t("Cache Read"), sessionStats.tokens.cacheRead.toLocaleString()]] : []),
++                      ...(sessionStats.tokens.cacheWrite > 0 ? [[t("Cache Write"), sessionStats.tokens.cacheWrite.toLocaleString()]] : []),
++                      [t("Total"), sessionStats.tokens.total.toLocaleString()],
+                     ];
+                     const ctx = contextUsage ?? sessionStats.contextUsage;
+                     const formatCompact = (n: number) => n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1000 ? `${(n / 1000).toFixed(0)}k` : String(n);
+                     const extraTokenRows = [
+-                      ...(sessionStats.cost > 0 ? [["Cost", `$${sessionStats.cost.toFixed(4)}`]] : []),
+-                      ...(ctx?.contextWindow ? [["Context", `${ctx.percent !== null ? `${ctx.percent.toFixed(1)}%` : "?"} / ${formatCompact(ctx.contextWindow)}`]] : []),
++                      ...(sessionStats.cost > 0 ? [[t("Cost"), `$${sessionStats.cost.toFixed(4)}`]] : []),
++                      ...(ctx?.contextWindow ? [[t("Context"), `${ctx.percent !== null ? `${ctx.percent.toFixed(1)}%` : "?"} / ${formatCompact(ctx.contextWindow)}`]] : []),
+                     ];
+                     const section = (
+                       title: string,
+@@ -1054,7 +1055,7 @@ export function AppShell() {
+                       return (
+                         <button
+                           type="button"
+-                          title={copied ? "Copied" : `Copy ${field === "file" ? "file path" : "session ID"}`}
++                          title={copied ? t("Copied") : `Copy ${field === "file" ? "file path" : "session ID"}`}
+                           onClick={() => handleCopySessionField(field, value)}
+                           style={{
+                             alignSelf: "start",
+@@ -1098,7 +1099,7 @@ export function AppShell() {
+                     };
+                     const sessionInfoSection = (
+                       <div style={{ minWidth: 0 }}>
+-                        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>Session Info</div>
++                        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>{t("Session Info")}</div>
+                         <div style={{ display: "grid", gridTemplateColumns: "auto minmax(0, 1fr) auto", columnGap: 12, rowGap: 8, alignItems: "start" }}>
+                           {sessionRows.map((row) => (
+                             <div key={`session-info:${row.label}`} style={{ display: "contents" }}>
+@@ -1129,13 +1130,13 @@ export function AppShell() {
+                         fontFamily: "var(--font-mono)",
+                       }}>
+                         {sessionInfoSection}
+-                        {section("Messages", messageRows)}
+-                        {section("Tokens", [...tokenRows, ...extraTokenRows], "right", true)}
++                        {section(t("Messages"), messageRows)}
++                        {section(t("Tokens"), [...tokenRows, ...extraTokenRows], "right", true)}
+                       </div>
+                     );
+                   })() : (
+                     <div style={{ fontSize: 12, color: "var(--text-muted)", fontStyle: "italic" }}>
+-                      Send a message or run /session to load session info
++                      {t("Send a message or run /session to load session info")}
+                     </div>
+                   )}
+                 </div>
+@@ -1169,7 +1170,7 @@ export function AppShell() {
+               role="status"
+               style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 24, color: "var(--text-muted)", textAlign: "center" }}
+             >
+-              <div style={{ fontSize: 14, color: "var(--text)" }}>Opening workspace...</div>
++              <div style={{ fontSize: 14, color: "var(--text)" }}>{t("Opening workspace...")}</div>
+               <div style={{ maxWidth: "min(720px, 100%)", overflowWrap: "anywhere", fontFamily: "var(--font-mono)", fontSize: 12 }}>
+                 {initialNavigation.requestedCwd}
+               </div>
+@@ -1179,7 +1180,7 @@ export function AppShell() {
+               role="alert"
+               style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 24, color: "var(--text-muted)", textAlign: "center" }}
+             >
+-              <div style={{ fontSize: 14, color: "#dc2626" }}>Unable to open workspace</div>
++              <div style={{ fontSize: 14, color: "#dc2626" }}>{t("Unable to open workspace")}</div>
+               <div style={{ maxWidth: "min(720px, 100%)", overflowWrap: "anywhere", fontFamily: "var(--font-mono)", fontSize: 12 }}>
+                 {initialNavigation.requestedCwd}
+               </div>
+@@ -1188,7 +1189,7 @@ export function AppShell() {
+           ) : showPlaceholder ? (
+             activeCwd ? (
+               <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: 15 }}>
+-                Select a session from the sidebar
++                {t("Select a session from the sidebar")}
+               </div>
+             ) : (
+               <div style={{ position: "absolute", top: 12, left: 12, display: "flex", alignItems: "flex-start", gap: 8, userSelect: "none", pointerEvents: "none" }}>
+@@ -1196,10 +1197,10 @@ export function AppShell() {
+                   <line x1="20" y1="12" x2="4" y2="12" /><polyline points="10 6 4 12 10 18" />
+                 </svg>
+                 <div>
+-                  <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Get Started</div>
++                  <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>{t("Get Started")}</div>
+                   <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.8 }}>
+-                    <span style={{ color: "var(--text-dim)", marginRight: 6 }}>1.</span>Select a project directory from the sidebar<br />
+-                    <span style={{ color: "var(--text-dim)", marginRight: 6 }}>2.</span>Add models via the <strong style={{ color: "var(--text)" }}>Models</strong> button at the bottom
++                    <span style={{ color: "var(--text-dim)", marginRight: 6 }}>1.</span>{t("Select a project directory from the sidebar")}<br />
++                    <span style={{ color: "var(--text-dim)", marginRight: 6 }}>2.</span>{t("Add models via the")} <strong style={{ color: "var(--text)" }}>{t("Models")}</strong> {t("button at the bottom")}
+                   </div>
+                 </div>
+               </div>
+@@ -1247,7 +1248,7 @@ export function AppShell() {
+             />
+           ) : (
+             <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-dim)", fontSize: 12 }}>
+-              No file open
++              {t("No file open")}
+             </div>
+           )}
+         </div>
+@@ -1256,8 +1257,8 @@ export function AppShell() {
+     {/* File panel toggle — always visible at top-right */}
+     <button
+       onClick={() => setRightPanelOpen((v) => !v)}
+-      title={rightPanelOpen ? "Hide file panel" : "Show file panel"}
+-      aria-label={rightPanelOpen ? "Hide file panel" : "Show file panel"}
++      title={rightPanelOpen ? t("Hide file panel") : t("Show file panel")}
++      aria-label={rightPanelOpen ? t("Hide file panel") : t("Show file panel")}
+       style={{
+         position: "fixed", top: 0, right: 0, zIndex: 300,
+         display: "flex", alignItems: "center", justifyContent: "center",
+diff --git a/components/BranchNavigator.tsx b/components/BranchNavigator.tsx
+index 253a4ad..832d247 100644
+--- a/components/BranchNavigator.tsx
++++ b/components/BranchNavigator.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+ import type { SessionEntry, SessionTreeNode } from "@/lib/types";
++import { t } from "@/lib/i18n";
+ 
+ interface Props {
+   tree: SessionTreeNode[];
+@@ -246,9 +247,9 @@ export function BranchNavigator({ tree, activeLeafId, onLeafChange, inline, cont
+   }, [onLeafChange]);
+ 
+   const noBranchReason = !hasSession
+-    ? "No active session"
++    ? t("No active session")
+     : !hasBranch(tree)
+-      ? "This session has no branches"
++      ? t("This session has no branches")
+       : null;
+ 
+   // Find first meaningful node (skip pure linear prefix)
+@@ -296,12 +297,12 @@ export function BranchNavigator({ tree, activeLeafId, onLeafChange, inline, cont
+           }}
+           onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text)"; }}
+           onMouseLeave={(e) => { e.currentTarget.style.color = open ? "var(--text)" : "var(--text-muted)"; }}
+-          title="Branches"
+-          aria-label="Branches"
++          title={t("Branches")}
++          aria-label={t("Branches")}
+           aria-pressed={open}
+         >
+           {branchIcon}
+-          {!compact && <span>Branches</span>}
++          {!compact && <span>{t("Branches")}</span>}
+         </button>
+         {open && dropdownPos && (
+           <div style={{
+@@ -358,7 +359,7 @@ export function BranchNavigator({ tree, activeLeafId, onLeafChange, inline, cont
+         }}
+       >
+         {branchIcon}
+-        <span style={{ color: "var(--text-muted)" }}>Branches</span>
++        <span style={{ color: "var(--text-muted)" }}>{t("Branches")}</span>
+         {chevron}
+       </button>
+ 
+@@ -390,7 +391,7 @@ export function BranchNavigator({ tree, activeLeafId, onLeafChange, inline, cont
+             </div>
+           ) : (
+             <div style={{ padding: "10px 16px", fontSize: 12, color: "var(--text-muted)", fontStyle: "italic" }}>
+-              {noBranchReason ?? "This session has no branches"}
++              {noBranchReason ?? t("This session has no branches")}
+             </div>
+           )}
+         </div>
+diff --git a/components/ChatInput.tsx b/components/ChatInput.tsx
+index bdeffcb..adc6008 100644
+--- a/components/ChatInput.tsx
++++ b/components/ChatInput.tsx
+@@ -9,6 +9,7 @@ import {
+ } from "@/lib/file-fuzzy";
+ import { FolderIcon, getFileIcon } from "./FileIcons";
+ import { useIsMobile } from "@/hooks/useIsMobile";
++import { t } from "@/lib/i18n";
+ 
+ export interface AttachedImage {
+   data: string;   // base64, no prefix
+@@ -80,14 +81,14 @@ function compareModelOptions(a: ModelOption, b: ModelOption): number {
+ 
+ const THINKING_LEVELS = ["auto", "off", "minimal", "low", "medium", "high", "xhigh", "max"] as const;
+ const THINKING_LEVEL_DESC: Record<typeof THINKING_LEVELS[number], string> = {
+-  auto: "Use pi default",
+-  off: "Reasoning off",
+-  minimal: "Minimal reasoning",
+-  low: "Low reasoning",
+-  medium: "Medium reasoning",
+-  high: "High reasoning",
+-  xhigh: "Extra-high reasoning",
+-  max: "Max reasoning",
++  auto: t("Use pi default"),
++  off: t("Reasoning off"),
++  minimal: t("Minimal reasoning"),
++  low: t("Low reasoning"),
++  medium: t("Medium reasoning"),
++  high: t("High reasoning"),
++  xhigh: t("Extra-high reasoning"),
++  max: t("Max reasoning"),
+ };
+ 
+ function formatTokenCount(tokens: number): string {
+@@ -105,20 +106,20 @@ type SlashCommandPaletteItem = SlashCommandInfo | {
+ type SlashCommandSource = SlashCommandPaletteItem["source"];
+ 
+ const BUILTIN_SLASH_COMMANDS: SlashCommandPaletteItem[] = [
+-  { name: "compact", description: "Compress context, optionally with instructions", source: "builtin" },
+-  { name: "reload", description: "Reload extensions, skills, prompts, and tools", source: "builtin" },
+-  { name: "name", description: "Set the session display name", source: "builtin" },
+-  { name: "session", description: "Show session message, token, and cost stats", source: "builtin" },
+-  { name: "copy", description: "Copy the last assistant message", source: "builtin" },
++  { name: "compact", description: t("Compress context, optionally with instructions"), source: "builtin" },
++  { name: "reload", description: t("Reload extensions, skills, prompts, and tools"), source: "builtin" },
++  { name: "name", description: t("Set the session display name"), source: "builtin" },
++  { name: "session", description: t("Show session message, token, and cost stats"), source: "builtin" },
++  { name: "copy", description: t("Copy the last assistant message"), source: "builtin" },
+ ];
+ 
+ const SLASH_SOURCES: SlashCommandSource[] = ["builtin", "extension", "prompt", "skill"];
+ 
+ const SLASH_SOURCE_GROUP_LABEL: Record<SlashCommandSource, string> = {
+-  builtin: "Built-in",
+-  extension: "Extensions",
+-  prompt: "Prompts",
+-  skill: "Skills",
++  builtin: t("Built-in"),
++  extension: t("Extensions"),
++  prompt: t("Prompts"),
++  skill: t("Skills"),
+ };
+ 
+ const SLASH_SOURCE_ORDER: Record<SlashCommandSource, number> = {
+@@ -443,8 +444,9 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+   })();
+ 
+   const slashCommandCountLabel = filteredSlashCommands.length === 1
+-    ? (slashQuery ? "1 match" : "1 command")
+-    : `${filteredSlashCommands.length} ${slashQuery ? "matches" : "commands"}`;
++    ? (slashQuery ? t("1 match") : t("1 command"))
++    : `${filteredSlashCommands.length} ${slashQuery ? t("matches") : t("commands")}`;
++
+   const hasInputText = Boolean(value.trim());
+   const canQueueStreamingMessage = hasInputText && attachedImages.length === 0;
+ 
+@@ -832,7 +834,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+     : 0;
+   const compactVerb = compactResult?.reason && compactResult.reason !== "manual"
+     ? `${compactResult.reason[0].toUpperCase()}${compactResult.reason.slice(1)} compacted`
+-    : "Compacted";
++    : t("Compacted");
+   const compactResultText = compactResult
+     ? `${compactVerb} ${formatTokenCount(compactResult.tokensBefore)} -> ${formatTokenCount(compactResult.estimatedTokensAfter)} tokens (${formatTokenCount(compactSavedTokens)} saved)`
+     : null;
+@@ -924,7 +926,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+               {onRecallQueue && (
+                 <button
+                   onClick={onRecallQueue}
+-                  title="Remove all queued messages and put them back into the input box for editing"
++                  title={t("Remove all queued messages and put them back into the input box for editing")}
+                   style={{
+                     display: "flex",
+                     alignItems: "center",
+@@ -952,7 +954,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                     <polyline points="9 14 4 9 9 4" />
+                     <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                   </svg>
+-                  Recall to input
++                  {t("Recall to input")}
+                 </button>
+               )}
+             </div>
+@@ -1052,13 +1054,13 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                   color: "var(--text-dim)",
+                 }}
+               >
+-                <span>{slashCommandsLoading ? "Loading commands..." : `Slash commands · ${slashCommandCountLabel}`}</span>
+-                <span style={{ fontFamily: "var(--font-mono)" }}>Tab / Enter</span>
++                <span>{slashCommandsLoading ? t("Loading commands...") : `${t("Slash commands")} · ${slashCommandCountLabel}`}</span>
++                <span style={{ fontFamily: "var(--font-mono)" }}>{t("Tab / Enter")}</span>
+               </div>
+               <div style={{ maxHeight: "calc(min(56vh, 460px) - 34px)", overflowY: "auto", padding: 10 }}>
+                 {!slashCommandsLoading && filteredSlashCommands.length === 0 ? (
+                   <div style={{ padding: "2px 2px 4px", fontSize: 12, color: "var(--text-dim)" }}>
+-                    No extension, prompt, or skill commands found
++                    {t("No extension, prompt, or skill commands found")}
+                   </div>
+                 ) : (
+                   groupedSlashCommands.map((group) => (
+@@ -1191,15 +1193,15 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                 >
+                   <span>
+                     {indexLoading
+-                      ? "Loading files..."
++                      ? t("Loading files...")
+                       : `Files · ${matchCountLabel}${truncatedHint}`}
+                   </span>
+-                  <span style={{ fontFamily: "var(--font-mono)" }}>Tab / Enter</span>
++                  <span style={{ fontFamily: "var(--font-mono)" }}>{t("Tab / Enter")}</span>
+                 </div>
+                 <div style={{ maxHeight: "calc(min(48vh, 400px) - 34px)", overflowY: "auto", padding: 4 }}>
+                   {!indexLoading && atMatches.length === 0 ? (
+                     <div style={{ padding: "6px 8px", fontSize: 12, color: "var(--text-dim)" }}>
+-                      {needsServerSearch && !serverResultInUse ? "Searching…" : "No matching files"}
++                      {needsServerSearch && !serverResultInUse ? t("Searching…") : t("No matching files")}
+                     </div>
+                   ) : (
+                     atMatches.map((entry, index) => {
+@@ -1290,9 +1292,9 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+             onPaste={handlePaste}
+             placeholder={
+               isStreaming && (onSteer || onFollowUp)
+-                ? "Steer now / queue follow-up..."
+-                : isStreaming ? "Agent is running…"
+-                : "Message… Type / for commands, @ for files"
++                ? t("Steer now / queue follow-up...")
++                : isStreaming ? t("Agent is running…")
++                : t("Message… Type / for commands, @ for files")
+             }
+             rows={1}
+             style={{
+@@ -1317,7 +1319,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                 <button
+                   onClick={() => sendQueued("steer")}
+                   disabled={!canQueueStreamingMessage}
+-                  title={attachedImages.length ? "Image attachments cannot be queued while the agent is running" : "Interrupt the current run and inject this message now"}
++                  title={attachedImages.length ? t("Image attachments cannot be queued while the agent is running") : t("Interrupt the current run and inject this message now")}
+                   style={{
+                     display: "flex", alignItems: "center", gap: 5,
+                     padding: "7px 12px",
+@@ -1333,14 +1335,14 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                   <svg width="12" height="12" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                     <path d="M5 1 L9 5 L5 9" /><line x1="1" y1="5" x2="9" y2="5" />
+                   </svg>
+-                  Steer
++                  {t("Steer")}
+                 </button>
+               )}
+               {onFollowUp && (
+                 <button
+                   onClick={() => sendQueued("followup")}
+                   disabled={!canQueueStreamingMessage}
+-                  title={attachedImages.length ? "Image attachments cannot be queued while the agent is running" : "Queue this message after the agent finishes"}
++                  title={attachedImages.length ? t("Image attachments cannot be queued while the agent is running") : t("Queue this message after the agent finishes")}
+                   style={{
+                     display: "flex", alignItems: "center", gap: 5,
+                     padding: "7px 12px",
+@@ -1357,7 +1359,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                     <line x1="5" y1="1" x2="5" y2="6" /><polyline points="2.5 3.5 5 1 7.5 3.5" />
+                     <line x1="2" y1="9" x2="8" y2="9" />
+                   </svg>
+-                  Follow-up
++                  {t("Follow-up")}
+                 </button>
+               )}
+             </div>
+@@ -1386,7 +1388,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                 <line x1="2" y1="7" x2="11" y2="7" />
+                 <polyline points="7.5 3 12 7 7.5 11" />
+               </svg>
+-              Send
++              {t("Send")}
+             </button>
+           )}
+           </div>
+@@ -1413,7 +1415,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+             <button
+               onClick={() => fileInputRef.current?.click()}
+               disabled={isStreaming}
+-              title="Attach image"
++              title={t("Attach image")}
+               style={{
+                 flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                 width: 32, height: 32, padding: 0,
+@@ -1567,8 +1569,8 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+             {isMobile && (
+               <button
+                 type="button"
+-                title={controlsMenuOpen ? undefined : "More controls"}
+-                aria-label="More controls"
++                title={controlsMenuOpen ? undefined : t("More controls")}
++                aria-label={t("More controls")}
+                 aria-expanded={controlsMenuOpen}
+                 aria-hidden={controlsMenuOpen || undefined}
+                 tabIndex={controlsMenuOpen ? -1 : undefined}
+@@ -1605,7 +1607,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                   e.currentTarget.style.color = "var(--text-muted)";
+                 }}
+               >
+-                More
++                {t("More")}
+               </button>
+             )}
+             <div style={{
+@@ -1634,8 +1636,8 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                 <button
+                   onClick={() => !isStreaming && setThinkingDropdownOpen((v) => !v)}
+                   disabled={isStreaming}
+-                  title={`Change reasoning level: ${thinkingDisplayLabel}`}
+-                  aria-label="Change reasoning level"
++                  title={`${t("Change reasoning level:")} ${thinkingDisplayLabel}`}
++                  aria-label={t("Change reasoning level")}
+                   style={{
+                     display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                     padding: isMobile ? "0 6px" : "8px 12px",
+@@ -1721,8 +1723,8 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                 <button
+                   onClick={() => !isStreaming && setToolDropdownOpen((v) => !v)}
+                   disabled={isStreaming}
+-                  title={`Change tool preset: ${toolPresetLabel}`}
+-                  aria-label="Change tool preset"
++                  title={`${t("Change tool preset:")} ${toolPresetLabel}`}
++                  aria-label={t("Change tool preset")}
+                   style={{
+                     display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                     padding: isMobile ? "0 6px" : "8px 12px",
+@@ -1762,7 +1764,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                     {TOOL_PRESETS.map((lvl) => {
+                       const preset = TOOL_PRESET_MAP[lvl];
+                       const isActive = (toolPreset ?? "default") === preset;
+-                      const desc = lvl === "off" ? "No tools, read-only" : lvl === "default" ? "4 built-in tools" : "All built-in tools";
++                      const desc = lvl === "off" ? t("No tools, read-only") : lvl === "default" ? t("4 built-in tools") : t("All built-in tools");
+                       return (
+                         <button
+                           key={lvl}
+@@ -1831,16 +1833,16 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                     e.currentTarget.style.background = isCompacting ? "rgba(239,68,68,0.08)" : "none";
+                     e.currentTarget.style.color = isCompacting ? "#ef4444" : "var(--text-muted)";
+                   }}
+-                  title={isCompacting ? "Stop compaction" : "Compact context"}
+-                  aria-label={isCompacting ? "Stop compaction" : "Compact context"}
++                  title={isCompacting ? t("Stop compaction") : t("Compact context")}
++                  aria-label={isCompacting ? t("Stop compaction") : t("Compact context")}
+                 >
+                   {isCompacting ? (
+-                    <><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" fill="currentColor" /></svg>{(!isMobile || controlsMenuOpen) && <span style={{ whiteSpace: "nowrap" }}>Compacting…</span>}</>
++                    <><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" fill="currentColor" /></svg>{(!isMobile || controlsMenuOpen) && <span style={{ whiteSpace: "nowrap" }}>{t("Compacting…")}</span>}</>
+                   ) : (
+                     <><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                       <polyline points="4 14 10 14 10 20" /><polyline points="20 10 14 10 14 4" />
+                       <line x1="10" y1="14" x2="3" y2="21" /><line x1="21" y1="3" x2="14" y2="10" />
+-                    </svg>{(!isMobile || controlsMenuOpen) && <span style={{ whiteSpace: "nowrap" }}>Compact</span>}</>
++                    </svg>{(!isMobile || controlsMenuOpen) && <span style={{ whiteSpace: "nowrap" }}>{t("Compact")}</span>}</>
+                   )}
+                 </button>
+               </div>
+@@ -1849,7 +1851,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+             {isStreaming && (
+               <button
+                 onClick={onAbort}
+-                title="Stop agent"
++                title={t("Stop agent")}
+                 style={{
+                   display: "flex", alignItems: "center", gap: 6,
+                   padding: "8px 14px",
+@@ -1869,15 +1871,15 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                   <rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="currentColor" />
+                 </svg>
+-                Stop
++                {t("Stop")}
+               </button>
+             )}
+ 
+             {onSoundToggle !== undefined && (
+               <button
+                 onClick={onSoundToggle}
+-                title={soundEnabled ? "Disable completion sound" : "Enable completion sound"}
+-                aria-label={soundEnabled ? "Disable completion sound" : "Enable completion sound"}
++                title={soundEnabled ? t("Disable completion sound") : t("Enable completion sound")}
++                aria-label={soundEnabled ? t("Disable completion sound") : t("Enable completion sound")}
+                 style={{
+                   display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                   width: isMobile ? 32 : 32,
+@@ -1920,8 +1922,8 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput({
+             {isMobile && controlsMenuOpen && (
+               <button
+                 type="button"
+-                title="Collapse controls"
+-                aria-label="Collapse controls"
++                title={t("Collapse controls")}
++                aria-label={t("Collapse controls")}
+                 aria-expanded={true}
+                 onClick={() => {
+                   setToolDropdownOpen(false);
+diff --git a/components/ChatWindow.tsx b/components/ChatWindow.tsx
+index 7a3d050..090c849 100644
+--- a/components/ChatWindow.tsx
++++ b/components/ChatWindow.tsx
+@@ -20,6 +20,7 @@ import {
+   restoreScrollTop,
+   VISIBLE_PAGE_SIZE,
+ } from "@/lib/chat-lazy-load";
++import { t } from "@/lib/i18n";
+ 
+ interface Props {
+   session: SessionInfo | null;
+@@ -39,15 +40,15 @@ interface Props {
+ 
+ function phaseLabel(phase: AgentPhase): string {
+   if (phase?.kind === "running_tools") {
+-    const names = phase.tools.map((t) => t.name);
+-    if (names.length === 0) return "Running tool...";
+-    if (names.length === 1) return `Running ${names[0]}...`;
+-    if (names.length <= 3) return `Running ${names.join(", ")}...`;
+-    return `Running ${names.slice(0, 2).join(", ")} (+${names.length - 2})...`;
++    const names = phase.tools.map((tool) => tool.name);
++    if (names.length === 0) return t("Running tool...");
++    if (names.length === 1) return `${t("Running")} ${names[0]}...`;
++    if (names.length <= 3) return `${t("Running")} ${names.join(", ")}...`;
++    return `${t("Running")} ${names.slice(0, 2).join(", ")} (+${names.length - 2})...`;
+   }
+-  if (phase?.kind === "waiting_model") return "Waiting for model...";
+-  if (phase?.kind === "running_command") return "Running command...";
+-  return "Thinking...";
++  if (phase?.kind === "waiting_model") return t("Waiting for model...");
++  if (phase?.kind === "running_command") return t("Running command...");
++  return t("Thinking...");
+ }
+ 
+ const CHAT_MINIMAP_WIDTH = 36;
+@@ -100,8 +101,8 @@ function withAssistantBlocks(
+ 
+ function ProcessDetailsGroup({ messageCount, toolCallCount, children }: { messageCount: number; toolCallCount: number; children: ReactNode }) {
+   const [expanded, setExpanded] = useState(false);
+-  const parts = ["Process details", `${messageCount} ${messageCount === 1 ? "message" : "messages"}`];
+-  if (toolCallCount > 0) parts.push(`${toolCallCount} ${toolCallCount === 1 ? "tool call" : "tool calls"}`);
++  const parts = [t("Process details"), `${messageCount} ${messageCount === 1 ? t("message") : t("messages")}`];
++  if (toolCallCount > 0) parts.push(`${toolCallCount} ${toolCallCount === 1 ? t("tool call") : t("tool calls")}`);
+ 
+   return (
+     <div style={{ marginBottom: 14 }}>
+@@ -123,7 +124,7 @@ function ProcessDetailsGroup({ messageCount, toolCallCount, children }: { messag
+           fontSize: 12,
+           textAlign: "left",
+         }}
+-        title={expanded ? "Collapse process details" : "Expand process details"}
++        title={expanded ? t("Collapse process details") : t("Expand process details")}
+       >
+         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, transform: expanded ? "rotate(90deg)" : "none", transition: "transform 0.15s" }}>
+           <polyline points="4 2.5 7.5 6 4 9.5" />
+@@ -334,7 +335,7 @@ export function ChatWindow({ session, newSessionCwd, onAgentEnd, onSessionCreate
+   if (loading) {
+     return (
+       <div className="flex h-full items-center justify-center text-text-muted">
+-        Loading session...
++        {t("Loading session...")}
+       </div>
+     );
+   }
+@@ -638,7 +639,7 @@ export function ChatWindow({ session, newSessionCwd, onAgentEnd, onSessionCreate
+ 
+             {bashRunning && !pendingBash && (
+               <div className="py-2 text-[13px] text-text-muted">
+-                <span className="animate-[pulse_1.5s_infinite]">Running command...</span>
++                <span className="animate-[pulse_1.5s_infinite]">{t("Running command...")}</span>
+               </div>
+             )}
+ 
+@@ -864,7 +865,7 @@ function ExtensionDialog({
+       >
+         <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--border)" }}>
+           <div style={{ color: "var(--text)", fontSize: 14, fontWeight: 650 }}>{request.title}</div>
+-          <div style={{ marginTop: 3, color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--font-mono)" }}>extension request</div>
++          <div style={{ marginTop: 3, color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--font-mono)" }}>{t("extension request")}</div>
+         </div>
+ 
+         <div style={{ padding: 14 }}>
+@@ -955,7 +956,7 @@ function ExtensionDialog({
+               cursor: "pointer",
+             }}
+           >
+-            Cancel
++            {t("Cancel")}
+           </button>
+           {request.method === "confirm" ? (
+             <button
+@@ -969,7 +970,7 @@ function ExtensionDialog({
+                 cursor: "pointer",
+               }}
+             >
+-              Confirm
++              {t("Confirm")}
+             </button>
+           ) : request.method !== "select" ? (
+             <button
+@@ -983,7 +984,7 @@ function ExtensionDialog({
+                 cursor: "pointer",
+               }}
+             >
+-              Submit
++              {t("Submit")}
+             </button>
+           ) : null}
+         </div>
+@@ -1050,7 +1051,7 @@ function ExtensionCustomPanel({
+       >
+         <textarea
+           ref={inputRef}
+-          aria-label="Extension terminal input"
++          aria-label={t("Extension terminal input")}
+           autoCapitalize="off"
+           autoComplete="off"
+           autoCorrect="off"
+@@ -1097,7 +1098,7 @@ function ExtensionCustomPanel({
+           }}
+         />
+         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderBottom: "1px solid var(--border)" }}>
+-          <div style={{ color: "var(--text)", fontSize: 13, fontWeight: 650 }}>Extension panel</div>
++          <div style={{ color: "var(--text)", fontSize: 13, fontWeight: 650 }}>{t("Extension panel")}</div>
+           <button
+             onClick={() => onInput(request, "\x03")}
+             style={{
+@@ -1110,7 +1111,7 @@ function ExtensionCustomPanel({
+               fontSize: 12,
+             }}
+           >
+-            Close
++            {t("Close")}
+           </button>
+         </div>
+         <pre
+diff --git a/components/FileExplorer.tsx b/components/FileExplorer.tsx
+index 1997053..20ad124 100644
+--- a/components/FileExplorer.tsx
++++ b/components/FileExplorer.tsx
+@@ -10,6 +10,7 @@ import {
+   normalizeFilePathSlashes,
+ } from "@/lib/file-paths";
+ import type { GitFileStatus, GitFileStatusKind, GitStatusResponse } from "@/lib/git-types";
++import { t } from "@/lib/i18n";
+ 
+ interface FileEntry {
+   name: string;
+@@ -101,12 +102,12 @@ async function fetchGitStatus(cwd: string): Promise<GitStatusResponse> {
+ }
+ 
+ const GIT_STATUS_LABELS: Record<GitFileStatusKind, string> = {
+-  modified: "Modified",
+-  added: "Added",
+-  deleted: "Deleted",
+-  renamed: "Renamed",
+-  untracked: "Untracked",
+-  conflict: "Conflict",
++  modified: t("Modified"),
++  added: t("Added"),
++  deleted: t("Deleted"),
++  renamed: t("Renamed"),
++  untracked: t("Untracked"),
++  conflict: t("Conflict"),
+ };
+ 
+ const GIT_STATUS_COLORS: Record<GitFileStatusKind, string> = {
+@@ -138,8 +139,8 @@ function uploadFiles(
+         onProgress(Math.round((event.loaded / event.total) * 100));
+       }
+     };
+-    xhr.onerror = () => reject(new Error("Network error while uploading files"));
+-    xhr.onabort = () => reject(new Error("Upload cancelled"));
++    xhr.onerror = () => reject(new Error(t("Network error while uploading files")));
++    xhr.onabort = () => reject(new Error(t("Upload cancelled")));
+     xhr.onload = () => {
+       let data: UploadResponse = {};
+       try {
+@@ -298,8 +299,8 @@ function TreeNode({
+         </span>
+         {highlighted && (
+           <span
+-            title="Newly uploaded"
+-            aria-label="Newly uploaded"
++            title={t("Newly uploaded")}
++            aria-label={t("Newly uploaded")}
+             style={{ width: 6, height: 6, flexShrink: 0, borderRadius: "50%", background: "#3b82f6" }}
+           />
+         )}
+@@ -322,8 +323,8 @@ function TreeNode({
+         )}
+         {!hovered && containsGitChanges && (
+           <span
+-            title="Contains changed files"
+-            aria-label="Contains changed files"
++            title={t("Contains changed files")}
++            aria-label={t("Contains changed files")}
+             style={{
+               width: 6,
+               height: 6,
+@@ -344,7 +345,7 @@ function TreeNode({
+               e.stopPropagation();
+               onAtMention(getRelativeFilePath(node.fullPath, cwd), node.isDir);
+             }}
+-            title="Insert path into chat"
++            title={t("Insert path into chat")}
+             style={{
+               position: "absolute",
+               right: !node.isDir ? 28 : 4,
+@@ -375,7 +376,7 @@ function TreeNode({
+             href={`/api/files/${encodeFilePathForApi(node.fullPath)}?type=download`}
+             download
+             onClick={(e) => e.stopPropagation()}
+-            title="Download file"
++            title={t("Download file")}
+             style={{
+               position: "absolute",
+               right: 4,
+@@ -637,7 +638,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+       {showUploadFeedback && (
+         <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border)" }}>
+         {uploadBusy && (
+-          <div role="status" aria-live="polite" aria-label={uploadPhase === "checking" ? "Checking files" : `Uploading, ${uploadProgress}%`}>
++          <div role="status" aria-live="polite" aria-label={uploadPhase === "checking" ? t("Checking files") : `${t("Uploading,")} ${uploadProgress}%`}>
+             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, minHeight: 14, color: "var(--text-muted)" }}>
+               {uploadPhase === "checking" ? (
+                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ animation: "spin 0.8s linear infinite" }} aria-hidden="true">
+@@ -663,7 +664,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+         {pendingConflict && (
+           <div role="alert" style={{ padding: 7, border: "1px solid color-mix(in srgb, #f59e0b 55%, var(--border))", borderRadius: 4, background: "color-mix(in srgb, #f59e0b 9%, var(--bg-panel))" }}>
+             <div style={{ fontSize: 11, color: "var(--text)", lineHeight: 1.35, overflowWrap: "anywhere" }}>
+-              {pendingConflict.conflicts.length} file{pendingConflict.conflicts.length === 1 ? "" : "s"} already exist: {pendingConflict.conflicts.join(", ")}
++              {pendingConflict.conflicts.length} {pendingConflict.conflicts.length === 1 ? t("file already exists") : t("files already exist")}: {pendingConflict.conflicts.join(", ")}
+             </div>
+             {pendingConflict.nonReplaceable.length > 0 && (
+               <div style={{ marginTop: 3, fontSize: 10, color: "#f59e0b", lineHeight: 1.35, overflowWrap: "anywhere" }}>
+@@ -672,13 +673,13 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+             )}
+             <div style={{ display: "flex", gap: 5, marginTop: 7 }}>
+               <button type="button" onClick={() => void performUpload(pendingConflict.files, "overwrite")} style={{ height: 22, padding: "0 7px", border: "1px solid #ef4444", borderRadius: 4, background: "transparent", color: "#ef4444", cursor: "pointer", fontSize: 10 }}>
+-                Replace
++                {t("Replace")}
+               </button>
+               <button type="button" onClick={() => void performUpload(pendingConflict.files, "skip")} style={{ height: 22, padding: "0 7px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-panel)", color: "var(--text)", cursor: "pointer", fontSize: 10 }}>
+-                Skip existing
++                {t("Skip existing")}
+               </button>
+               <button type="button" onClick={() => setPendingConflict(null)} style={{ height: 22, padding: "0 7px", border: "none", borderRadius: 4, background: "transparent", color: "var(--text-muted)", cursor: "pointer", fontSize: 10 }}>
+-                Cancel
++                {t("Cancel")}
+               </button>
+             </div>
+           </div>
+@@ -687,7 +688,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+         {uploadError && (
+           <div role="alert" style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, lineHeight: 1.35, color: "#f87171" }}>
+             <span style={{ minWidth: 0, flex: 1, overflowWrap: "anywhere" }}>{uploadError}</span>
+-            <DismissButton onClick={() => setUploadError(null)} title="Dismiss error" />
++            <DismissButton onClick={() => setUploadError(null)} title={t("Dismiss error")} />
+           </div>
+         )}
+ 
+@@ -696,7 +697,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+             <div style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 22, fontSize: 11 }}>
+               <div style={{ minWidth: 0, flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                 {uploadSummary.uploaded.length > 0 && (
+-                  <span title={`${uploadSummary.uploaded.length} uploaded`} aria-label={`${uploadSummary.uploaded.length} uploaded`} style={{ display: "flex", alignItems: "center", gap: 3, color: "#22c55e" }}>
++                  <span title={`${uploadSummary.uploaded.length} ${t("uploaded")}`} aria-label={`${uploadSummary.uploaded.length} ${t("uploaded")}`} style={{ display: "flex", alignItems: "center", gap: 3, color: "#22c55e" }}>
+                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                       <path d="m5 12 4 4L19 6" />
+                     </svg>
+@@ -704,7 +705,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+                   </span>
+                 )}
+                 {uploadSummary.skipped.length > 0 && (
+-                  <span title={`${uploadSummary.skipped.length} skipped`} aria-label={`${uploadSummary.skipped.length} skipped`} style={{ display: "flex", alignItems: "center", gap: 3, color: "var(--text-dim)" }}>
++                  <span title={`${uploadSummary.skipped.length} ${t("skipped")}`} aria-label={`${uploadSummary.skipped.length} ${t("skipped")}`} style={{ display: "flex", alignItems: "center", gap: 3, color: "var(--text-dim)" }}>
+                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                       <circle cx="12" cy="12" r="9" />
+                       <path d="M8 12h8" />
+@@ -713,7 +714,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+                   </span>
+                 )}
+                 {uploadSummary.errors.length > 0 && (
+-                  <span title={`${uploadSummary.errors.length} failed`} aria-label={`${uploadSummary.errors.length} failed`} style={{ display: "flex", alignItems: "center", gap: 3, color: "#f87171" }}>
++                  <span title={`${uploadSummary.errors.length} ${t("failed")}`} aria-label={`${uploadSummary.errors.length} ${t("failed")}`} style={{ display: "flex", alignItems: "center", gap: 3, color: "#f87171" }}>
+                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                       <path d="M12 3 2.5 20h19L12 3Z" />
+                       <path d="M12 9v4" />
+@@ -727,15 +728,15 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+                 <button
+                   type="button"
+                   onClick={addUploadedFilesToChat}
+-                  title={uploadSummary.uploaded.length === 1 ? "Add uploaded file to chat" : "Add all uploaded files to chat"}
+-                  aria-label={uploadSummary.uploaded.length === 1 ? "Add uploaded file to chat" : "Add all uploaded files to chat"}
++                  title={uploadSummary.uploaded.length === 1 ? t("Add uploaded file to chat") : t("Add all uploaded files to chat")}
++                  aria-label={uploadSummary.uploaded.length === 1 ? t("Add uploaded file to chat") : t("Add all uploaded files to chat")}
+                   style={{ height: 22, padding: "0 7px", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, flexShrink: 0, border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-panel)", color: "var(--accent)", cursor: "pointer", fontSize: 11, fontWeight: 600, whiteSpace: "nowrap" }}
+                 >
+                   <MentionIcon />
+                   mention
+                 </button>
+               )}
+-              <DismissButton onClick={() => setUploadSummary(null)} title="Dismiss upload results" />
++              <DismissButton onClick={() => setUploadSummary(null)} title={t("Dismiss upload results")} />
+             </div>
+             {uploadSummary.errors.map((item) => (
+               <div key={item.name} title={item.error} style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3, minWidth: 0, fontSize: 10, color: "#f87171" }}>
+@@ -754,7 +755,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+ 
+       <div style={{ padding: "2px 4px" }}>
+         {loading ? (
+-          <div style={{ padding: "8px 12px", fontSize: 11, color: "var(--text-dim)" }}>Loading files...</div>
++          <div style={{ padding: "8px 12px", fontSize: 11, color: "var(--text-dim)" }}>{t("Loading files...")}</div>
+         ) : error ? (
+           <div style={{ padding: "8px 12px", fontSize: 11, color: "#f87171" }}>{error}</div>
+         ) : (
+@@ -777,7 +778,7 @@ export const FileExplorer = forwardRef<FileExplorerHandle, Props>(function FileE
+         )}
+         {!loading && !error && roots.length === 0 && (
+           <div style={{ padding: "8px 12px", fontSize: 11, color: "var(--text-dim)" }}>
+-            No files found
++            {t("No files found")}
+           </div>
+         )}
+       </div>
+diff --git a/components/FileViewer.tsx b/components/FileViewer.tsx
+index 2354472..d219f33 100644
+--- a/components/FileViewer.tsx
++++ b/components/FileViewer.tsx
+@@ -22,6 +22,7 @@ import { resolveLocalFileHref } from "@/lib/file-links";
+ import { markdownPreviewRehypePlugins, markdownPreviewRemarkPlugins } from "@/lib/markdown";
+ import { parseUnifiedPatch } from "@/lib/patch";
+ import type { GitFileDiffResponse } from "@/lib/git-types";
++import { t } from "@/lib/i18n";
+ 
+ interface Props {
+   filePath: string;
+@@ -40,9 +41,9 @@ interface FileData {
+ type DisplayMode = "source" | "preview" | "diff";
+ 
+ const DISPLAY_MODE_LABELS: Record<DisplayMode, string> = {
+-  source: "Source",
+-  preview: "Preview",
+-  diff: "Diff",
++  source: t("Source"),
++  preview: t("Preview"),
++  diff: t("Diff"),
+ };
+ 
+ const FILE_CODE_STYLE: CSSProperties = {
+@@ -135,8 +136,8 @@ function DownloadLink({ filePath, sourceSessionId }: { filePath: string; sourceS
+     <a
+       href={getFileApiUrl(filePath, "download", sourceSessionId)}
+       download={getFileName(filePath)}
+-      title="Download file"
+-      aria-label="Download file"
++      title={t("Download file")}
++      aria-label={t("Download file")}
+       className="file-viewer-icon-button"
+     >
+       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+@@ -204,7 +205,7 @@ function DiffView({ patch }: { patch: string }) {
+   if (!hasChanges) {
+     return (
+       <div style={{ padding: "12px 16px", fontSize: 12, color: "var(--text-dim)", fontFamily: "var(--font-mono)" }}>
+-        No changes
++        {t("No changes")}
+       </div>
+     );
+   }
+@@ -399,7 +400,7 @@ function ImageViewer({ filePath, cwd, sourceSessionId }: Props) {
+         {naturalSize && <span>{naturalSize.w} × {naturalSize.h}</span>}
+         {formatSizeStr && <span>{formatSizeStr}</span>}
+         <span
+-          title={watching ? "Live sync active" : "Not watching"}
++          title={watching ? t("Live sync active") : t("Not watching")}
+           style={{ display: "flex", alignItems: "center", gap: 4, color: watching ? "#4ade80" : "var(--text-dim)" }}
+         >
+           <span
+@@ -442,7 +443,7 @@ function ImageViewer({ filePath, cwd, sourceSessionId }: Props) {
+               const img = e.currentTarget;
+               setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight });
+             }}
+-            onError={() => setError("Failed to load image")}
++            onError={() => setError(t("Failed to load image"))}
+             style={{
+               maxWidth: "100%",
+               maxHeight: "100%",
+@@ -532,7 +533,7 @@ function AudioViewer({ filePath, cwd, sourceSessionId }: Props) {
+         {duration != null && <span>{formatDuration(duration)}</span>}
+         {size != null && <span>{formatSize(size)}</span>}
+         <span
+-          title={watching ? "Live sync active" : "Not watching"}
++          title={watching ? t("Live sync active") : t("Not watching")}
+           style={{ display: "flex", alignItems: "center", gap: 4, color: watching ? "#4ade80" : "var(--text-dim)" }}
+         >
+           <span
+@@ -571,7 +572,7 @@ function AudioViewer({ filePath, cwd, sourceSessionId }: Props) {
+             preload="metadata"
+             src={src}
+             onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+-            onError={() => setError("Failed to load audio")}
++            onError={() => setError(t("Failed to load audio"))}
+             style={{ width: "100%" }}
+           />
+         </div>
+@@ -666,7 +667,7 @@ function DocumentViewer({ filePath, cwd, sourceSessionId }: Props) {
+         {size != null && <span>{formatSize(size)}</span>}
+         <DownloadLink filePath={filePath} sourceSessionId={sourceSessionId} />
+         <span
+-          title={watching ? "Live sync active" : "Not watching"}
++          title={watching ? t("Live sync active") : t("Not watching")}
+           style={{ display: "flex", alignItems: "center", gap: 4, color: watching ? "#4ade80" : "var(--text-dim)", flexShrink: 0 }}
+         >
+           <span
+@@ -692,7 +693,7 @@ function DocumentViewer({ filePath, cwd, sourceSessionId }: Props) {
+             key={previewUrl}
+             src={previewUrl}
+             sandbox={isPdf ? undefined : ""}
+-            title={`Preview ${getFileName(filePath)}`}
++            title={`${t("Preview")} ${getFileName(filePath)}`}
+             style={{ width: "100%", height: "100%", border: "none", background: isPdf ? "var(--bg)" : "#eef1f5" }}
+           />
+         )}
+@@ -821,7 +822,7 @@ function TextFileViewer({ filePath, cwd, sourceSessionId, onOpenFile, gitRefresh
+   if (loading) {
+     return (
+       <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: 13 }}>
+-        Loading...
++        {t("Loading...")}
+       </div>
+     );
+   }
+@@ -870,8 +871,8 @@ function TextFileViewer({ filePath, cwd, sourceSessionId, onOpenFile, gitRefresh
+ 
+         <span className="file-viewer-meta" title={metadata}>{metadata}</span>
+         <span
+-          title={watching ? "Live sync active" : "Not watching"}
+-          aria-label={watching ? "Live sync active" : "Not watching"}
++          title={watching ? t("Live sync active") : t("Not watching")}
++          aria-label={watching ? t("Live sync active") : t("Not watching")}
+           className="file-viewer-live-indicator"
+           style={{
+             background: watching ? "#4ade80" : "var(--border)",
+@@ -881,7 +882,7 @@ function TextFileViewer({ filePath, cwd, sourceSessionId, onOpenFile, gitRefresh
+ 
+         <div className="file-viewer-controls">
+           {displayModes.length > 1 && (
+-            <div className="file-viewer-mode-switch" aria-label="File view mode">
++            <div className="file-viewer-mode-switch" aria-label={t("File view mode")}>
+               {displayModes.map((mode) => {
+                 const active = displayMode === mode;
+                 return (
+@@ -889,7 +890,7 @@ function TextFileViewer({ filePath, cwd, sourceSessionId, onOpenFile, gitRefresh
+                     key={mode}
+                     type="button"
+                     onClick={() => setDisplayMode(mode)}
+-                    title={mode === "diff" ? "Compare working tree with HEAD" : undefined}
++                    title={mode === "diff" ? t("Compare working tree with HEAD") : undefined}
+                     aria-pressed={active}
+                     className="file-viewer-mode-button"
+                     style={{
+@@ -909,8 +910,8 @@ function TextFileViewer({ filePath, cwd, sourceSessionId, onOpenFile, gitRefresh
+               <button
+                 type="button"
+                 onClick={() => setWrapLines((value) => !value)}
+-                title={wrapLines ? "Disable word wrap" : "Enable word wrap"}
+-                aria-label={wrapLines ? "Disable word wrap" : "Enable word wrap"}
++                title={wrapLines ? t("Disable word wrap") : t("Enable word wrap")}
++                aria-label={wrapLines ? t("Disable word wrap") : t("Enable word wrap")}
+                 aria-pressed={wrapLines}
+                 className="file-viewer-icon-button"
+                 style={{
+@@ -941,7 +942,7 @@ function TextFileViewer({ filePath, cwd, sourceSessionId, onOpenFile, gitRefresh
+             srcDoc={data.content}
+             sandbox="allow-scripts"
+             style={{ width: "100%", height: "100%", border: "none", background: "var(--bg)" }}
+-            title="HTML preview"
++            title={t("HTML preview")}
+           />
+         ) : isMarkdown && displayMode === "preview" ? (
+           <div
+diff --git a/components/MarkdownBody.tsx b/components/MarkdownBody.tsx
+index e5665cf..b390eed 100644
+--- a/components/MarkdownBody.tsx
++++ b/components/MarkdownBody.tsx
+@@ -9,6 +9,7 @@ import { useTheme } from "@/hooks/useTheme";
+ import { copyText } from "@/lib/clipboard";
+ import { resolveLocalFileHref } from "@/lib/file-links";
+ import { markdownRehypePlugins, markdownRemarkPlugins } from "@/lib/markdown";
++import { t } from "@/lib/i18n";
+ 
+ interface MarkdownBodyProps {
+   children: string;
+@@ -145,7 +146,7 @@ function MermaidBlock({ code, isStreaming }: { code: string; isStreaming?: boole
+       });
+ 
+       const parsed = await mermaid.parse(code, { suppressErrors: true });
+-      if (!parsed) throw new Error("Invalid Mermaid diagram");
++      if (!parsed) throw new Error(t("Invalid Mermaid diagram"));
+ 
+       const id =
+         typeof crypto !== "undefined" && "randomUUID" in crypto
+@@ -171,10 +172,10 @@ function MermaidBlock({ code, isStreaming }: { code: string; isStreaming?: boole
+     <button
+       onClick={() => setShowPreview((v) => !v)}
+       disabled={isStreaming}
+-      title={isStreaming ? "Preview available after streaming" : (showPreview ? "Show Mermaid source" : "Preview Mermaid diagram")}
++      title={isStreaming ? t("Preview available after streaming") : (showPreview ? t("Show Mermaid source") : t("Preview Mermaid diagram"))}
+       className={["markdown-code-action", showPreview ? "is-active" : ""].filter(Boolean).join(" ")}
+     >
+-      {showPreview ? "Source" : "Preview"}
++      {showPreview ? t("Source") : t("Preview")}
+     </button>
+   );
+ 
+@@ -184,9 +185,9 @@ function MermaidBlock({ code, isStreaming }: { code: string; isStreaming?: boole
+ 
+   const body =
+     failedKey === currentKey ? (
+-      <div className="mermaid-block mermaid-block-error">Invalid Mermaid diagram</div>
++      <div className="mermaid-block mermaid-block-error">{t("Invalid Mermaid diagram")}</div>
+     ) : !svg || renderedKey !== currentKey ? (
+-      <div className="mermaid-block mermaid-block-loading" aria-label="Rendering Mermaid diagram" />
++      <div className="mermaid-block mermaid-block-loading" aria-label={t("Rendering Mermaid diagram")} />
+     ) : (
+       <div
+         className="mermaid-block"
+diff --git a/components/MessageView.tsx b/components/MessageView.tsx
+index 8b431f0..09fdd66 100644
+--- a/components/MessageView.tsx
++++ b/components/MessageView.tsx
+@@ -19,6 +19,7 @@ import type {
+   ToolCallContent,
+   ThinkingContent,
+ } from "@/lib/types";
++import { t } from "@/lib/i18n";
+ 
+ const MAX_THINKING_CACHE_ENTRIES = 100;
+ const thinkingContentCache = new Map<string, Promise<string>>();
+@@ -37,7 +38,7 @@ function loadThinkingContent(sessionId: string, entryId: string, blockIndex: num
+   ).then(async (response) => {
+     if (!response.ok) throw new Error(`HTTP ${response.status}`);
+     const data = await response.json() as { thinking?: unknown };
+-    if (typeof data.thinking !== "string") throw new Error("Invalid thinking response");
++    if (typeof data.thinking !== "string") throw new Error(t("Invalid thinking response"));
+     return data.thinking;
+   }).catch((error) => {
+     thinkingContentCache.delete(key);
+@@ -239,7 +240,7 @@ function UserMessageView({ message, cwd, onOpenFile, entryId, onFork, forking, o
+           }}>
+             <button
+               onClick={copyContent}
+-              title="Copy message"
++              title={t("Copy message")}
+               style={{
+                 display: "flex", alignItems: "center", gap: 4,
+                 padding: "3px 8px", height: 22,
+@@ -264,7 +265,7 @@ function UserMessageView({ message, cwd, onOpenFile, entryId, onFork, forking, o
+                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                 </svg>
+               )}
+-              {copied ? "Copied" : "Copy"}
++              {copied ? t("Copied") : t("Copy")}
+             </button>
+           </div>
+           {(canFork || canNavigate) && (
+@@ -277,7 +278,7 @@ function UserMessageView({ message, cwd, onOpenFile, entryId, onFork, forking, o
+               {canNavigate && (
+                 <button
+                   onClick={() => { onNavigate!(prevAssistantEntryId!); onEditContent?.(content); }}
+-                  title="Edit from here — branches within this session"
++                  title={t("Edit from here — branches within this session")}
+                   style={{
+                     display: "flex", alignItems: "center", gap: 4,
+                     padding: "3px 8px", height: 22,
+@@ -296,14 +297,14 @@ function UserMessageView({ message, cwd, onOpenFile, entryId, onFork, forking, o
+                     <polyline points="15 10 20 15 15 20" />
+                     <path d="M4 4v7a4 4 0 0 0 4 4h12" />
+                   </svg>
+-                  Edit from here
++                  {t("Edit from here")}
+                 </button>
+               )}
+               {canFork && (
+                 <button
+                   onClick={() => { onFork!(entryId!); }}
+                   disabled={forking}
+-                  title={forking ? "Creating new session…" : "New session — creates an independent copy from here"}
++                  title={forking ? t("Creating new session…") : t("New session — creates an independent copy from here")}
+                   style={{
+                     display: "flex", alignItems: "center", gap: 4,
+                     padding: "3px 8px", height: 22,
+@@ -324,7 +325,7 @@ function UserMessageView({ message, cwd, onOpenFile, entryId, onFork, forking, o
+                     <circle cx="6" cy="18" r="3" />
+                     <path d="M18 9a9 9 0 0 1-9 9" />
+                   </svg>
+-                  {forking ? "Creating…" : "New session"}
++                  {forking ? t("Creating…") : t("New session")}
+                 </button>
+               )}
+             </div>
+@@ -501,7 +502,7 @@ function AssistantMessageView({
+             <>
+ 
+               {est > 0 && (
+-                <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text)" }} title="Estimated token count while streaming">
++                <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text)" }} title={t("Estimated token count while streaming")}>
+                   <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 11, fontWeight: 400 }}>
+                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                       <line x1="5" y1="1.5" x2="5" y2="8.5" /><polyline points="2 6 5 8.5 8 6" />
+@@ -540,7 +541,7 @@ function AssistantMessageView({
+         {textContent && !isStreaming && (
+           <button
+             onClick={copyContent}
+-            title="Copy message"
++            title={t("Copy message")}
+             style={{
+               display: "flex", alignItems: "center", gap: 4,
+               padding: "3px 8px", height: 22,
+@@ -567,7 +568,7 @@ function AssistantMessageView({
+                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+               </svg>
+             )}
+-            {copied ? "Copied" : "Copy"}
++            {copied ? t("Copied") : t("Copy")}
+           </button>
+         )}
+         {time && !isStreaming && (
+@@ -615,7 +616,7 @@ function ThinkingBlock({ block, duration, sessionId, entryId, blockIndex }: {
+     setExpanded(nextExpanded);
+     if (!nextExpanded || !block.deferred || content !== null) return;
+     if (!sessionId || !entryId) {
+-      setError("Thinking content unavailable");
++      setError(t("Thinking content unavailable"));
+       return;
+     }
+ 
+@@ -655,7 +656,7 @@ function ThinkingBlock({ block, duration, sessionId, entryId, blockIndex }: {
+           textAlign: "left",
+         }}
+       >
+-        <span>Thinking</span>
++        <span>{t("Thinking")}</span>
+         {duration !== undefined && (
+           <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-dim)", fontVariantNumeric: "tabular-nums" }}>{duration}s</span>
+         )}
+@@ -672,7 +673,7 @@ function ThinkingBlock({ block, duration, sessionId, entryId, blockIndex }: {
+             borderTop: "1px solid var(--border)",
+           }}
+         >
+-          {loading ? "Loading thinking..." : error ?? (block.deferred ? content : block.thinking)}
++          {loading ? t("Loading thinking...") : error ?? (block.deferred ? content : block.thinking)}
+         </div>
+       )}
+     </div>
+@@ -822,8 +823,8 @@ function SplitPatchView({ text }: { text: string }) {
+                 borderBottom: "1px solid var(--border)",
+               }}
+             >
+-              <SplitDiffHeader title={file.oldPath || "Before"} side="left" />
+-              <SplitDiffHeader title={file.newPath || "After"} side="right" />
++              <SplitDiffHeader title={file.oldPath || t("Before")} side="left" />
++              <SplitDiffHeader title={file.newPath || t("After")} side="right" />
+             </div>
+           )}
+ 
+@@ -1086,7 +1087,7 @@ function CompactionMessageView({ message }: { message: CustomMessage }) {
+ 
+         <div style={{ padding: "11px 13px 12px" }}>
+           <div style={{ color: "var(--text)", fontSize: 15, fontWeight: 700, lineHeight: 1.35 }}>
+-            Conversation compacted
++            {t("Conversation compacted")}
+           </div>
+           <div style={{ marginTop: 3, marginBottom: 10, color: "var(--text)", fontSize: 14, lineHeight: 1.5 }}>
+             The conversation history before this point was compacted into the following summary:
+@@ -1094,7 +1095,7 @@ function CompactionMessageView({ message }: { message: CustomMessage }) {
+           {parsedSummary.body ? (
+             <MarkdownBody className="markdown-compaction-message">{parsedSummary.body}</MarkdownBody>
+           ) : (
+-            <span style={{ color: "var(--text-dim)", fontSize: 12 }}>(no summary)</span>
++            <span style={{ color: "var(--text-dim)", fontSize: 12 }}>{t("(no summary)")}</span>
+           )}
+           <CompactionFileMetadata readFiles={parsedSummary.readFiles} modifiedFiles={parsedSummary.modifiedFiles} />
+         </div>
+@@ -1114,8 +1115,8 @@ function CompactionFileMetadata({ readFiles, modifiedFiles }: { readFiles: strin
+   return (
+     <details className="compaction-file-details">
+       <summary>File context: {parts.join(", ")}</summary>
+-      {modifiedFiles.length > 0 && <CompactionFileList title="Modified files" files={modifiedFiles} />}
+-      {readFiles.length > 0 && <CompactionFileList title="Read files" files={readFiles} />}
++      {modifiedFiles.length > 0 && <CompactionFileList title={t("Modified files")} files={modifiedFiles} />}
++      {readFiles.length > 0 && <CompactionFileList title={t("Read files")} files={readFiles} />}
+     </details>
+   );
+ }
+@@ -1178,7 +1179,7 @@ function CustomMessageView({ message, cwd, onOpenFile }: { message: CustomMessag
+           <span style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 650 }}>
+             {title}
+           </span>
+-          {isHiddenDisplay && <span style={{ color: "var(--text-dim)", fontSize: 11 }}>hidden extension message</span>}
++          {isHiddenDisplay && <span style={{ color: "var(--text-dim)", fontSize: 11 }}>{t("hidden extension message")}</span>}
+           {time && <span style={{ marginLeft: "auto", color: "var(--text-dim)", fontSize: 10 }}>{time}</span>}
+         </div>
+ 
+@@ -1201,7 +1202,7 @@ function CustomMessageView({ message, cwd, onOpenFile }: { message: CustomMessag
+                 })}
+               </div>
+             )}
+-            {text ? <MarkdownBody className="markdown-custom-message" cwd={cwd} onOpenFile={onOpenFile}>{text}</MarkdownBody> : <span style={{ color: "var(--text-dim)", fontSize: 12 }}>(no message)</span>}
++            {text ? <MarkdownBody className="markdown-custom-message" cwd={cwd} onOpenFile={onOpenFile}>{text}</MarkdownBody> : <span style={{ color: "var(--text-dim)", fontSize: 12 }}>{t("(no message)")}</span>}
+           </div>
+         ) : (
+           <button
+@@ -1218,7 +1219,7 @@ function CustomMessageView({ message, cwd, onOpenFile }: { message: CustomMessag
+               textAlign: "left",
+             }}
+           >
+-            {text ? previewText(text) : "Show extension message"}
++            {text ? previewText(text) : t("Show extension message")}
+           </button>
+         )}
+ 
+@@ -1244,7 +1245,7 @@ function CustomMessageView({ message, cwd, onOpenFile }: { message: CustomMessag
+                 fontSize: 11,
+               }}
+             >
+-              {copied ? "Copied" : "Copy"}
++              {copied ? t("Copied") : t("Copy")}
+             </button>
+           ) : null}
+           {(hasDetails || isHiddenDisplay) && (
+@@ -1264,8 +1265,8 @@ function CustomMessageView({ message, cwd, onOpenFile }: { message: CustomMessag
+               }}
+             >
+               {isHiddenDisplay
+-                ? (contentExpanded ? "Collapse" : "Expand")
+-                : (detailsExpanded ? "Hide details" : "Show details")}
++                ? (contentExpanded ? t("Collapse") : t("Expand"))
++                : (detailsExpanded ? t("Hide details") : t("Show details"))}
+             </button>
+           )}
+         </div>
+@@ -1332,7 +1333,7 @@ function formatCustomType(type: string): string {
+ 
+ function previewText(text: string): string {
+   const normalized = text.replace(/\s+/g, " ").trim();
+-  if (!normalized) return "Show extension message";
++  if (!normalized) return t("Show extension message");
+   return normalized.length > 140 ? `${normalized.slice(0, 140)}...` : normalized;
+ }
+ 
+@@ -1404,7 +1405,7 @@ function BashExecutionView({ message, sessionId }: { message: BashExecutionMessa
+   // Reuse the existing ToolCallBlock so user-run bash looks identical to an
+   // agent-run bash tool call: same header, collapse behavior, result pane.
+   // Synthesize an equivalent ToolCallContent + ToolResultMessage pair.
+-  const toolName = message.excludeFromContext ? "bash (local)" : "bash";
++  const toolName = message.excludeFromContext ? t("bash (local)") : "bash";
+   const block: ToolCallContent = {
+     type: "toolCall",
+     toolCallId: `bash-${message.timestamp ?? ""}`,
+@@ -1433,14 +1434,14 @@ function BashExecutionView({ message, sessionId }: { message: BashExecutionMessa
+               disabled={loadingFull}
+               style={{ background: "none", border: "none", color: "var(--accent)", cursor: loadingFull ? "default" : "pointer", fontSize: 11, padding: 0, textDecoration: "underline" }}
+             >
+-              {loadingFull ? "loading…" : "view full output"}
++              {loadingFull ? t("loading…") : t("view full output")}
+             </button>
+           )}
+           <a
+             href={`${fullOutputUrl}&download=1`}
+             style={{ marginLeft: showFullButton ? 10 : 0, color: "var(--accent)", fontSize: 11, textDecoration: "underline" }}
+           >
+-            download full output
++            {t("download full output")}
+           </a>
+           {fullError && <span style={{ marginLeft: 6, color: "var(--text-dim)", fontSize: 11 }}>({fullError})</span>}
+         </div>
+diff --git a/components/ModelsConfig.tsx b/components/ModelsConfig.tsx
+index cf75402..065175a 100644
+--- a/components/ModelsConfig.tsx
++++ b/components/ModelsConfig.tsx
+@@ -33,6 +33,7 @@ import NvidiaColorIcon from "@lobehub/icons/es/Nvidia/components/Color";
+ import OpenCodeIcon from "@lobehub/icons/es/OpenCode/components/Mono";
+ import XiaomiMiMoIcon from "@lobehub/icons/es/XiaomiMiMo/components/Mono";
+ import ZAIIcon from "@lobehub/icons/es/ZAI/components/Mono";
++import { t } from "@/lib/i18n";
+ 
+ type IconComponent = React.ComponentType<{ size?: number | string; style?: React.CSSProperties }>;
+ 
+@@ -219,8 +220,8 @@ function SecretTextInput({
+       <button
+         type="button"
+         onClick={() => setVisible((v) => !v)}
+-        aria-label={visible ? "Hide API key" : "Show API key"}
+-        title={visible ? "Hide API key" : "Show API key"}
++        aria-label={visible ? t("Hide API key") : t("Show API key")}
++        title={visible ? t("Hide API key") : t("Show API key")}
+         style={{
+           position: "absolute",
+           right: 5,
+@@ -302,37 +303,37 @@ function ProviderDetail({ name, provider, onChange, onRename, onDelete }: {
+   return (
+     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+-        <SectionTitle>Provider</SectionTitle>
++        <SectionTitle>{t("Provider")}</SectionTitle>
+         <button onClick={onDelete}
+           style={{ padding: "3px 8px", background: "none", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 4, color: "#ef4444", cursor: "pointer", fontSize: 11 }}>
+-          Delete
++          {t("Delete")}
+         </button>
+       </div>
+ 
+-      <Field label="Provider name">
++      <Field label={t("Provider name")}>
+         <TextInput value={editingName} onChange={setEditingName} placeholder="provider-name" mono />
+         {editingName !== name && editingName.trim() && (
+           <button onClick={() => onRename(editingName.trim())}
+             style={{ marginTop: 4, padding: "3px 10px", background: "var(--accent)", border: "none", borderRadius: 4, color: "#fff", cursor: "pointer", fontSize: 11, alignSelf: "flex-start" }}>
+-            Rename
++            {t("Rename")}
+           </button>
+         )}
+       </Field>
+ 
+-      <Field label="Base URL">
++      <Field label={t("Base URL")}>
+         <TextInput value={provider.baseUrl ?? ""} onChange={(v) => set("baseUrl", v || undefined)}
+           placeholder="https://api.example.com/v1" mono />
+       </Field>
+ 
+-      <Field label="API Key">
++      <Field label={t("API Key")}>
+         <SecretTextInput value={provider.apiKey ?? ""} onChange={(v) => set("apiKey", v || undefined)}
+-          placeholder="ENV_VAR_NAME, !shell-command, or literal key" mono />
++          placeholder={t("ENV_VAR_NAME, !shell-command, or literal key")} mono />
+         <span style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 2 }}>
+-          Prefix with <code style={{ fontFamily: "var(--font-mono)" }}>!</code> to run a shell command, or use an env var name
++          {t("Prefix with")} <code style={{ fontFamily: "var(--font-mono)" }}>!</code> {t("to run a shell command, or use an env var name")}
+         </span>
+       </Field>
+ 
+-      <Field label="API">
++      <Field label={t("API")}>
+         <Select value={provider.api ?? "openai-completions"} onChange={(v) => set("api", v)} options={API_OPTIONS} required />
+       </Field>
+     </div>
+@@ -436,13 +437,13 @@ function ThinkingLevelMapEditor({
+                 onClick={() => setLevel(level, "omit")}
+                 style={{ ...btnBase, ...(state === "omit" ? btnActive : {}) }}
+               >
+-                Default
++                {t("Default")}
+               </button>
+               <button
+                 onClick={() => setLevel(level, null)}
+                 style={{ ...btnBase, borderLeft: "1px solid var(--border)", ...(state === "null" ? btnActiveDisabled : {}) }}
+               >
+-                Disabled
++                {t("Disabled")}
+               </button>
+             </div>
+ 
+@@ -452,7 +453,7 @@ function ThinkingLevelMapEditor({
+                 onClick={() => setLevel(level, strVal || level)}
+                 style={{ ...btnBase, ...(state === "string" ? btnActive : {}), borderRight: "1px solid var(--border)", flexShrink: 0 }}
+               >
+-                Custom
++                {t("Custom")}
+               </button>
+               <input
+                 value={strVal}
+@@ -524,15 +525,15 @@ function ModelDetail({
+   };
+   const testSummary = (() => {
+     if (testState.phase === "idle") return null;
+-    if (testState.phase === "testing") return "Testing model connection...";
++    if (testState.phase === "testing") return t("Testing model connection...");
+     const meta = [
+       testState.latencyMs !== undefined ? `${testState.latencyMs}ms` : null,
+       testState.status !== undefined ? `HTTP ${testState.status}` : null,
+     ].filter(Boolean);
+     if (testState.phase === "success") {
+-      return ["Connected", ...meta, testState.responseText || null].filter(Boolean).join(" · ");
++      return [t("Connected"), ...meta, testState.responseText || null].filter(Boolean).join(" · ");
+     }
+-    return ["Failed", ...meta, testState.message].filter(Boolean).join(" · ");
++    return [t("Failed"), ...meta, testState.message].filter(Boolean).join(" · ");
+   })();
+ 
+   useEffect(() => {
+@@ -578,7 +579,7 @@ function ModelDetail({
+   return (
+     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+-        <SectionTitle>Model</SectionTitle>
++        <SectionTitle>{t("Model")}</SectionTitle>
+         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+           {testSummary && (
+             <span
+@@ -606,7 +607,7 @@ function ModelDetail({
+           <button
+             onClick={handleTest}
+             disabled={!model.id.trim() || testState.phase === "testing"}
+-            title="Test model connection"
++            title={t("Test model connection")}
+             style={{
+               height: 24,
+               padding: "0 8px",
+@@ -628,46 +629,46 @@ function ModelDetail({
+                 <polyline points="20 6 9 17 4 12" />
+               </svg>
+             )}
+-            {testState.phase === "testing" ? "Testing…" : testState.phase === "success" ? "OK" : "Test"}
++            {testState.phase === "testing" ? t("Testing…") : testState.phase === "success" ? t("OK") : t("Test")}
+           </button>
+           <button onClick={onDelete}
+             style={{ height: 24, padding: "0 8px", background: "none", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 4, color: "#ef4444", cursor: "pointer", fontSize: 11, boxSizing: "border-box" }}>
+-            Remove
++            {t("Remove")}
+           </button>
+         </div>
+       </div>
+ 
+       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+-        <Field label="ID *"><TextInput value={model.id} onChange={(v) => set("id", v)} placeholder="model-id" mono /></Field>
+-        <Field label="Name"><TextInput value={model.name ?? ""} onChange={(v) => set("name", v || undefined)} placeholder="Display name" /></Field>
++        <Field label={t("ID *")}><TextInput value={model.id} onChange={(v) => set("id", v)} placeholder="model-id" mono /></Field>
++        <Field label={t("Name")}><TextInput value={model.name ?? ""} onChange={(v) => set("name", v || undefined)} placeholder={t("Display name")} /></Field>
+       </div>
+ 
+-      <Field label="API override">
++      <Field label={t("API override")}>
+         <Select value={model.api ?? ""} onChange={(v) => set("api", v || undefined)} options={API_OPTIONS} />
+       </Field>
+ 
+       <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+-        <Check label="Reasoning / thinking" checked={model.reasoning ?? false} onChange={(v) => set("reasoning", v || undefined)} />
+-        <Check label="Image input" checked={model.input?.includes("image") ?? false}
++        <Check label={t("Reasoning / thinking")} checked={model.reasoning ?? false} onChange={(v) => set("reasoning", v || undefined)} />
++        <Check label={t("Image input")} checked={model.input?.includes("image") ?? false}
+           onChange={(v) => set("input", v ? ["text", "image"] : undefined)} />
+       </div>
+ 
+       {model.reasoning && (
+         <>
+           <Check
+-            label="DeepSeek thinking compat"
++            label={t("DeepSeek thinking compat")}
+             checked={hasDeepseekCompat(model)}
+             onChange={(v) => onChange(setDeepseekCompat(model, v))}
+           />
+           <div>
+             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+-              <SectionTitle>Thinking level map</SectionTitle>
++              <SectionTitle>{t("Thinking level map")}</SectionTitle>
+               {model.thinkingLevelMap && (
+                 <button
+                   onClick={() => set("thinkingLevelMap", undefined)}
+                   style={{ fontSize: 10, padding: "2px 7px", background: "none", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text-dim)", cursor: "pointer" }}
+                 >
+-                  clear all
++                  {t("clear all")}
+                 </button>
+               )}
+             </div>
+@@ -680,18 +681,18 @@ function ModelDetail({
+       )}
+ 
+       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+-        <Field label="Context window (tokens)">
++        <Field label={t("Context window (tokens)")}>
+           <NumInput value={model.contextWindow !== undefined ? String(model.contextWindow) : ""}
+             onChange={(v) => set("contextWindow", v ? parseInt(v) : undefined)} placeholder="128000" />
+         </Field>
+-        <Field label="Max output tokens">
++        <Field label={t("Max output tokens")}>
+           <NumInput value={model.maxTokens !== undefined ? String(model.maxTokens) : ""}
+             onChange={(v) => set("maxTokens", v ? parseInt(v) : undefined)} placeholder="16384" />
+         </Field>
+       </div>
+ 
+       <div>
+-        <SectionTitle>Cost (per million tokens)</SectionTitle>
++        <SectionTitle>{t("Cost (per million tokens)")}</SectionTitle>
+         <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+           {(["input", "output", "cacheRead", "cacheWrite"] as const).map((k) => (
+             <Field key={k} label={k}>
+@@ -777,7 +778,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+     };
+     es.onerror = () => {
+       es.close();
+-      setLoginState((prev) => prev.phase === "success" ? prev : { phase: "error", message: "Connection lost" });
++      setLoginState((prev) => prev.phase === "success" ? prev : { phase: "error", message: t("Connection lost") });
+     };
+   }, [provider.id, onRefresh]);
+ 
+@@ -789,7 +790,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+ 
+   const submitCode = useCallback(async (token: string, code: string) => {
+     if (!code.trim()) return;
+-    setLoginState({ phase: "progress", message: "Verifying…" });
++    setLoginState({ phase: "progress", message: t("Verifying…") });
+     try {
+       const res = await fetch(`/api/auth/login/${encodeURIComponent(provider.id)}`, {
+         method: "POST",
+@@ -804,12 +805,12 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+       setInputValue("");
+       // Success path: SSE stream will emit "success" and update state
+     } catch (e) {
+-      setLoginState({ phase: "error", message: e instanceof Error ? e.message : "Network error" });
++      setLoginState({ phase: "error", message: e instanceof Error ? e.message : t("Network error") });
+     }
+   }, [provider.id]);
+ 
+   const submitSelection = useCallback(async (token: string, value: string) => {
+-    setLoginState({ phase: "progress", message: "Continuing…" });
++    setLoginState({ phase: "progress", message: t("Continuing…") });
+     try {
+       const res = await fetch(`/api/auth/login/${encodeURIComponent(provider.id)}`, {
+         method: "POST",
+@@ -821,7 +822,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+         setLoginState({ phase: "error", message: d.error ?? `Server error ${res.status}` });
+       }
+     } catch (e) {
+-      setLoginState({ phase: "error", message: e instanceof Error ? e.message : "Network error" });
++      setLoginState({ phase: "error", message: e instanceof Error ? e.message : t("Network error") });
+     }
+   }, [provider.id]);
+ 
+@@ -832,11 +833,11 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+   return (
+     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+-        <SectionTitle>Subscription</SectionTitle>
++        <SectionTitle>{t("Subscription")}</SectionTitle>
+         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+           <span style={{ width: 7, height: 7, borderRadius: "50%", background: provider.loggedIn ? "#4ade80" : "var(--border)", display: "inline-block" }} />
+           <span style={{ fontSize: 11, color: provider.loggedIn ? "#4ade80" : "var(--text-dim)" }}>
+-            {provider.loggedIn ? "connected" : "not connected"}
++            {provider.loggedIn ? t("connected") : t("not connected")}
+           </span>
+         </div>
+       </div>
+@@ -845,11 +846,11 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+       <div style={{ minHeight: 48 }}>
+         {loginState.phase === "idle" && (
+           <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>
+-            {provider.loggedIn ? "Already connected. You can re-login or disconnect." : `Connect your ${provider.name} account.`}
++            {provider.loggedIn ? t("Already connected. You can re-login or disconnect.") : `Connect your ${provider.name} account.`}
+           </p>
+         )}
+         {loginState.phase === "connecting" && (
+-          <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Opening browser…</p>
++          <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>{t("Opening browser…")}</p>
+         )}
+         {loginState.phase === "select" && (
+           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+@@ -873,14 +874,14 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+             <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>
+               {loginState.phase === "auth"
+-                ? "Complete sign-in in the browser, then copy the redirect URL from the address bar and paste it below."
++                ? t("Complete sign-in in the browser, then copy the redirect URL from the address bar and paste it below.")
+                 : loginState.message}
+             </p>
+             {loginState.phase === "auth" && (
+               <p style={{ margin: 0, fontSize: 11, color: "var(--text-dim)", lineHeight: 1.5 }}>
+                 If the browser window did not open,{" "}
+                 <a href={loginState.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", wordBreak: "break-all" }}>
+-                  click here to open the login page
++                  {t("click here to open the login page")}
+                 </a>
+                 .
+               </p>
+@@ -891,7 +892,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+                 value={inputValue}
+                 onChange={(e) => setInputValue(e.target.value)}
+                 onKeyDown={(e) => { if (e.key === "Enter") submitCode(loginState.token, inputValue); }}
+-                placeholder={loginState.phase === "auth" ? "http://localhost:1455/auth/callback?code=…" : (loginState.placeholder ?? "Enter value…")}
++                placeholder={loginState.phase === "auth" ? "http://localhost:1455/auth/callback?code=…" : (loginState.placeholder ?? t("Enter value…"))}
+                 style={{ flex: 1, padding: "6px 9px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text)", fontSize: 12, outline: "none", fontFamily: "var(--font-mono)", boxSizing: "border-box" }}
+               />
+               <button
+@@ -899,7 +900,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+                 disabled={!inputValue.trim()}
+                 style={{ padding: "6px 12px", background: inputValue.trim() ? "var(--accent)" : "var(--bg-panel)", border: "none", borderRadius: 5, color: inputValue.trim() ? "#fff" : "var(--text-dim)", cursor: inputValue.trim() ? "pointer" : "not-allowed", fontSize: 12, fontWeight: 600, flexShrink: 0 }}
+               >
+-                Submit
++                {t("Submit")}
+               </button>
+             </div>
+           </div>
+@@ -907,7 +908,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+         {loginState.phase === "device_code" && (
+           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+             <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>
+-              Open the verification page and enter this code:
++              {t("Open the verification page and enter this code:")}
+             </p>
+             <div style={{ padding: "8px 10px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text)", fontSize: 16, fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: 0 }}>
+               {loginState.userCode}
+@@ -924,7 +925,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+           <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>{loginState.message}</p>
+         )}
+         {loginState.phase === "success" && (
+-          <p style={{ margin: 0, fontSize: 12, color: "#4ade80" }}>Connected successfully.</p>
++          <p style={{ margin: 0, fontSize: 12, color: "#4ade80" }}>{t("Connected successfully.")}</p>
+         )}
+         {loginState.phase === "error" && (
+           <p style={{ margin: 0, fontSize: 12, color: "#f87171" }}>{loginState.message}</p>
+@@ -938,7 +939,7 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+             onClick={() => { eventSourceRef.current?.close(); setLoginState({ phase: "idle" }); }}
+             style={{ padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: "pointer", fontSize: 12 }}
+           >
+-            Cancel
++            {t("Cancel")}
+           </button>
+         ) : (
+           <>
+@@ -946,14 +947,14 @@ function OAuthDetail({ provider, onRefresh }: { provider: OAuthProvider; onRefre
+               onClick={handleLogin}
+               style={{ padding: "5px 14px", background: "var(--accent)", border: "none", borderRadius: 5, color: "#fff", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+             >
+-              {provider.loggedIn ? "Re-login" : "Login"}
++              {provider.loggedIn ? t("Re-login") : t("Login")}
+             </button>
+             {provider.loggedIn && (
+               <button
+                 onClick={handleLogout}
+                 style={{ padding: "5px 12px", background: "none", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 5, color: "#ef4444", cursor: "pointer", fontSize: 12 }}
+               >
+-                Disconnect
++                {t("Disconnect")}
+               </button>
+             )}
+           </>
+@@ -1024,11 +1025,11 @@ function ApiKeyDetail({ provider, onRefresh }: { provider: ApiKeyProvider; onRef
+   return (
+     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+-        <SectionTitle>API Key</SectionTitle>
++        <SectionTitle>{t("API Key")}</SectionTitle>
+         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+           <span style={{ width: 7, height: 7, borderRadius: "50%", background: provider.configured ? "#4ade80" : "var(--border)", display: "inline-block" }} />
+           <span style={{ fontSize: 11, color: provider.configured ? "#4ade80" : "var(--text-dim)" }}>
+-            {provider.configured ? "configured" : "not configured"}
++            {provider.configured ? t("configured") : t("not configured")}
+           </span>
+         </div>
+       </div>
+@@ -1039,13 +1040,13 @@ function ApiKeyDetail({ provider, onRefresh }: { provider: ApiKeyProvider; onRef
+           : `Enter your ${provider.displayName} API key to enable ${provider.modelCount} model${provider.modelCount !== 1 ? "s" : ""}.`}
+       </p>
+ 
+-      <Field label="API Key">
++      <Field label={t("API Key")}>
+         <div style={{ display: "flex", gap: 6 }}>
+           <SecretTextInput
+             value={apiKey}
+             onChange={setApiKey}
+             onKeyDown={(e) => { if (e.key === "Enter" && apiKey.trim()) handleSave(); }}
+-            placeholder={provider.configured ? "Enter new key to replace…" : "sk-…"}
++            placeholder={provider.configured ? t("Enter new key to replace…") : "sk-…"}
+             style={{ flex: 1 }}
+             autoComplete="off"
+             spellCheck={false}
+@@ -1069,7 +1070,7 @@ function ApiKeyDetail({ provider, onRefresh }: { provider: ApiKeyProvider; onRef
+                 <polyline points="20 6 9 17 4 12" />
+               </svg>
+             )}
+-            {savedOk ? "Saved" : saving ? "Saving…" : "Save"}
++            {savedOk ? t("Saved") : saving ? t("Saving…") : t("Save")}
+           </button>
+         </div>
+       </Field>
+@@ -1087,7 +1088,7 @@ function ApiKeyDetail({ provider, onRefresh }: { provider: ApiKeyProvider; onRef
+             cursor: removing ? "not-allowed" : "pointer", fontSize: 12,
+           }}
+         >
+-          {removing ? "Removing…" : "Disconnect"}
++          {removing ? t("Removing…") : t("Disconnect")}
+         </button>
+       )}
+     </div>
+@@ -1194,7 +1195,7 @@ function AddProviderPicker({
+             value={search}
+             onChange={(e) => setSearch(e.target.value)}
+             onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}
+-            placeholder="Search providers…"
++            placeholder={t("Search providers…")}
+             style={{ flex: 1, background: "none", border: "none", outline: "none", color: "var(--text)", fontSize: 13, boxSizing: "border-box" }}
+           />
+         </div>
+@@ -1202,11 +1203,11 @@ function AddProviderPicker({
+         {/* Card grid */}
+         <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
+           {totalCount === 0 ? (
+-            <div style={{ padding: "20px 0", fontSize: 12, color: "var(--text-dim)", textAlign: "center" }}>No providers match</div>
++            <div style={{ padding: "20px 0", fontSize: 12, color: "var(--text-dim)", textAlign: "center" }}>{t("No providers match")}</div>
+           ) : (
+             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))", gap: 8 }}>
+               {showCustom && (
+-                <div style={{ gridColumn: "1 / -1", fontSize: 10, fontWeight: 600, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Custom</div>
++                <div style={{ gridColumn: "1 / -1", fontSize: 10, fontWeight: 600, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{t("Custom")}</div>
+               )}
+               {showCustom && (
+                 <button
+@@ -1216,8 +1217,8 @@ function AddProviderPicker({
+                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--bg-panel)"; }}
+                 >
+                   <div style={{ flex: 1, minWidth: 0 }}>
+-                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>OpenAI / Anthropic compatible</div>
+-                    <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 2 }}>Custom endpoint format</div>
++                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t("OpenAI / Anthropic compatible")}</div>
++                    <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 2 }}>{t("Custom endpoint format")}</div>
+                   </div>
+                   <span style={{ width: 26, height: 26, borderRadius: 5, background: "var(--bg-hover)", border: "1px dashed var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-dim)" }}>
+@@ -1228,7 +1229,7 @@ function AddProviderPicker({
+               )}
+ 
+               {availableOAuth.length > 0 && (
+-                <div style={{ gridColumn: "1 / -1", paddingTop: showCustom ? 6 : 0, fontSize: 10, fontWeight: 600, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Subscriptions</div>
++                <div style={{ gridColumn: "1 / -1", paddingTop: showCustom ? 6 : 0, fontSize: 10, fontWeight: 600, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{t("Subscriptions")}</div>
+               )}
+               {availableOAuth.map((p) => (
+                 <button key={p.id} onClick={() => { onSelectOAuth(p.id); onClose(); }}
+@@ -1238,14 +1239,14 @@ function AddProviderPicker({
+                 >
+                   <div style={{ flex: 1, minWidth: 0 }}>
+                     <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+-                    <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 2 }}>OAuth</div>
++                    <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 2 }}>{t("OAuth")}</div>
+                   </div>
+                   <ProviderIcon id={p.id} size={28} />
+                 </button>
+               ))}
+ 
+               {availableApiKey.length > 0 && (
+-                <div style={{ gridColumn: "1 / -1", paddingTop: availableOAuth.length > 0 ? 6 : 0, fontSize: 10, fontWeight: 600, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.07em" }}>API Key</div>
++                <div style={{ gridColumn: "1 / -1", paddingTop: availableOAuth.length > 0 ? 6 : 0, fontSize: 10, fontWeight: 600, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{t("API Key")}</div>
+               )}
+               {availableApiKey.map((p) => (
+                 <button key={p.id} onClick={() => { onSelectApiKey(p.id); onClose(); }}
+@@ -1460,7 +1461,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+         {/* Header */}
+         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px", borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
+           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+-            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Models</span>
++            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>{t("Models")}</span>
+             <code style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>~/.pi/agent/models.json</code>
+           </div>
+           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 20, lineHeight: 1, padding: "2px 6px" }}>×</button>
+@@ -1519,7 +1520,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+ 
+               {/* Custom providers */}
+               {loading ? (
+-                <div style={{ padding: "10px 8px", fontSize: 12, color: "var(--text-muted)" }}>Loading…</div>
++                <div style={{ padding: "10px 8px", fontSize: 12, color: "var(--text-muted)" }}>{t("Loading…")}</div>
+               ) : providers.map(([pName, pData]) => {
+                 const isProviderSelected = selection?.type === "provider" && selection.name === pName;
+                 const models = pData.models ?? [];
+@@ -1556,7 +1557,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+                           onMouseLeave={(e) => { if (!isModelSelected) e.currentTarget.style.background = "none"; }}
+                         >
+                           <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: m.id ? "var(--text-muted)" : "var(--text-dim)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+-                            {m.id || "new model"}
++                            {m.id || t("new model")}
+                           </span>
+                           {m.reasoning && (
+                             <span style={{ fontSize: 9, padding: "1px 4px", background: "rgba(99,102,241,0.12)", color: "rgba(99,102,241,0.8)", borderRadius: 3, flexShrink: 0 }}>T</span>
+@@ -1572,7 +1573,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+                       onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.background = "var(--bg-hover)"; }}
+                       onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; e.currentTarget.style.background = "none"; }}
+                     >
+-                      <span style={{ fontSize: 11 }}>+ model</span>
++                      <span style={{ fontSize: 11 }}>{t("+ model")}</span>
+                     </div>
+                   </div>
+                 );
+@@ -1589,7 +1590,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+                 onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                 onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+               >
+-                + Add provider
++                {t("+ Add provider")}
+               </button>
+             </div>
+           </div>
+@@ -1598,7 +1599,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+           <div style={{ flex: 1, overflowY: "auto", padding: 20 }}>
+             {loading ? null : detailContent ?? (
+               <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-dim)", fontSize: 13 }}>
+-                Select a provider or model
++                {t("Select a provider or model")}
+               </div>
+             )}
+           </div>
+@@ -1608,7 +1609,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, padding: "10px 18px", borderTop: "1px solid var(--border)", flexShrink: 0 }}>
+           {saveError && <span style={{ fontSize: 12, color: "#f87171", flex: 1 }}>{saveError}</span>}
+           <button onClick={onClose} style={{ padding: "6px 14px", background: "none", border: "1px solid var(--border)", borderRadius: 6, color: "var(--text-muted)", cursor: "pointer", fontSize: 13 }}>
+-            Cancel
++            {t("Cancel")}
+           </button>
+           <button onClick={handleSave} disabled={saving || savedOk} style={{
+             position: "relative",
+@@ -1628,7 +1629,7 @@ export function ModelsConfig({ onClose }: { onClose: () => void }) {
+                 <polyline points="20 6 9 17 4 12" />
+               </svg>
+             )}
+-            <span>{savedOk ? "Saved" : saving ? "Saving…" : "Save"}</span>
++            <span>{savedOk ? t("Saved") : saving ? t("Saving…") : t("Save")}</span>
+           </button>
+         </div>
+       </div>
+diff --git a/components/PluginsConfig.tsx b/components/PluginsConfig.tsx
+index 39b4368..ee73797 100644
+--- a/components/PluginsConfig.tsx
++++ b/components/PluginsConfig.tsx
+@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ import { sendAgentCommand } from "@/lib/agent-client";
+ import { useIsMobile } from "@/hooks/useIsMobile";
+ import type { PluginPackageInfo, PluginsResponse } from "@/lib/api-types";
++import { t } from "@/lib/i18n";
+ 
+ type PluginScope = PluginPackageInfo["scope"];
+ type PluginAction = "install" | "remove" | "update" | "disable" | "enable";
+@@ -17,21 +18,21 @@ function packageKey(pkg: Pick<PluginPackageInfo, "source" | "scope">): string {
+ }
+ 
+ function resourceSummary(pkg: PluginPackageInfo): string {
+-  if (pkg.disabled) return "Disabled";
++  if (pkg.disabled) return t("Disabled");
+   const parts = [
+     pkg.counts.extensions ? `${pkg.counts.extensions} ext` : "",
+     pkg.counts.skills ? `${pkg.counts.skills} skills` : "",
+     pkg.counts.prompts ? `${pkg.counts.prompts} prompts` : "",
+     pkg.counts.themes ? `${pkg.counts.themes} themes` : "",
+   ].filter(Boolean);
+-  return parts.length ? parts.join(" · ") : "No resources";
++  return parts.length ? parts.join(" · ") : t("No resources");
+ }
+ 
+ function versionSummary(pkg: PluginPackageInfo): string {
+   const parts = [];
+   if (pkg.version) parts.push(`installed ${pkg.version}`);
+   if (pkg.configuredVersion) parts.push(`configured ${pkg.configuredVersion}`);
+-  return parts.length ? parts.join(" · ") : "Unknown";
++  return parts.length ? parts.join(" · ") : t("Unknown");
+ }
+ 
+ function installLocation(scope: PluginScope, cwd: string): string {
+@@ -61,10 +62,10 @@ function statusColor(status: PluginPackageInfo["status"]): string {
+ 
+ function ResourceList({ pkg }: { pkg: PluginPackageInfo }) {
+   const groups = ([
+-    ["extension", "Extensions"],
+-    ["skill", "Skills"],
+-    ["prompt", "Prompts"],
+-    ["theme", "Themes"],
++    ["extension", t("Extensions")],
++    ["skill", t("Skills")],
++    ["prompt", t("Prompts")],
++    ["theme", t("Themes")],
+   ] as const)
+     .map(([kind, label]) => ({
+       kind,
+@@ -76,7 +77,7 @@ function ResourceList({ pkg }: { pkg: PluginPackageInfo }) {
+   if (groups.length === 0) {
+     return (
+       <div style={{ fontSize: 12, color: "var(--text-dim)" }}>
+-        {pkg.disabled ? "Package disabled" : "No resolved resources"}
++        {pkg.disabled ? t("Package disabled") : t("No resolved resources")}
+       </div>
+     );
+   }
+@@ -299,7 +300,7 @@ function AddPluginPanel({
+     <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 660, minHeight: "100%" }}>
+       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+         <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+-          Add Plugin
++          {t("Add Plugin")}
+         </div>
+         <div style={{ fontSize: 12, color: "var(--text-dim)", fontFamily: "var(--font-mono)" }}>
+           {installLocation(scope, cwd)}
+@@ -308,7 +309,7 @@ function AddPluginPanel({
+ 
+       <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+         <label htmlFor="plugin-source" style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)" }}>
+-          Source
++          {t("Source")}
+         </label>
+         <input
+           id="plugin-source"
+@@ -347,13 +348,13 @@ function AddPluginPanel({
+             borderColor: "var(--accent)",
+           }}
+         >
+-          {busy ? "Installing..." : "Install"}
++          {busy ? t("Installing...") : t("Install")}
+         </button>
+       </div>
+ 
+       <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)" }}>
+-          Examples
++          {t("Examples")}
+         </div>
+         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+           {examples.map((example) => (
+@@ -430,7 +431,7 @@ function PackageDetail({
+             enabled={enabled}
+             loading={busy || reloadBusy}
+             onToggle={() => onAction(pkg.disabled ? "enable" : "disable", pkg)}
+-            label={pkg.disabled ? "Enable package" : "Disable package"}
++            label={pkg.disabled ? t("Enable package") : t("Disable package")}
+           />
+           <ScopeTag scope={pkg.scope} />
+           {pkg.disabled ? (
+@@ -478,22 +479,22 @@ function PackageDetail({
+             disabled={busy || reloadBusy}
+             style={buttonStyle(busy || reloadBusy)}
+           >
+-            {busyKey === `update:${key}` ? "Updating..." : "Update"}
++            {busyKey === `update:${key}` ? t("Updating...") : t("Update")}
+           </button>
+           <button
+             onClick={onReloadSession}
+             disabled={!sessionId || reloadBusy || busy}
+             style={buttonStyle(!sessionId || reloadBusy || busy)}
+-            title={sessionId ? "Reload current session" : "Open a session to reload"}
++            title={sessionId ? t("Reload current session") : t("Open a session to reload")}
+           >
+-            {reloadBusy ? "Reloading..." : "Reload session"}
++            {reloadBusy ? t("Reloading...") : t("Reload session")}
+           </button>
+           <button
+             onClick={() => onAction("remove", pkg)}
+             disabled={busy || reloadBusy}
+             style={buttonStyle(busy || reloadBusy, true)}
+           >
+-            {busyKey === `remove:${key}` ? "Removing..." : "Remove"}
++            {busyKey === `remove:${key}` ? t("Removing...") : t("Remove")}
+           </button>
+         </div>
+       </div>
+@@ -507,17 +508,17 @@ function PackageDetail({
+           lineHeight: 1.45,
+         }}
+       >
+-        <div style={{ color: "var(--text-dim)" }}>Status</div>
++        <div style={{ color: "var(--text-dim)" }}>{t("Status")}</div>
+         <div style={{ color: statusColor(pkg.status), textTransform: "capitalize" }}>{pkg.status}</div>
+-        <div style={{ color: "var(--text-dim)" }}>Version</div>
++        <div style={{ color: "var(--text-dim)" }}>{t("Version")}</div>
+         <div style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{versionSummary(pkg)}</div>
+-        <div style={{ color: "var(--text-dim)" }}>Package</div>
++        <div style={{ color: "var(--text-dim)" }}>{t("Package")}</div>
+         <div style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)", overflowWrap: "anywhere" }}>
+-          {pkg.packageName ?? "Unknown"}
++          {pkg.packageName ?? t("Unknown")}
+         </div>
+-        <div style={{ color: "var(--text-dim)" }}>Resources</div>
++        <div style={{ color: "var(--text-dim)" }}>{t("Resources")}</div>
+         <div style={{ color: "var(--text-muted)" }}>{resourceSummary(pkg)}</div>
+-        <div style={{ color: "var(--text-dim)" }}>Installed path</div>
++        <div style={{ color: "var(--text-dim)" }}>{t("Installed path")}</div>
+         <div
+           style={{
+             color: pkg.installedPath ? "var(--text-muted)" : "#ef4444",
+@@ -525,9 +526,9 @@ function PackageDetail({
+             overflowWrap: "anywhere",
+           }}
+         >
+-          {pkg.installedPath ? shortenPath(pkg.installedPath) : "Not found"}
++          {pkg.installedPath ? shortenPath(pkg.installedPath) : t("Not found")}
+         </div>
+-        <div style={{ color: "var(--text-dim)" }}>Cwd</div>
++        <div style={{ color: "var(--text-dim)" }}>{t("Cwd")}</div>
+         <div style={{ color: "var(--text-dim)", fontFamily: "var(--font-mono)", overflowWrap: "anywhere" }}>
+           {shortenPath(cwd)}
+         </div>
+@@ -535,7 +536,7 @@ function PackageDetail({
+ 
+       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+         <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>
+-          Resolved Resources
++          {t("Resolved Resources")}
+         </div>
+         <ResourceList pkg={pkg} />
+       </div>
+@@ -627,13 +628,13 @@ export function PluginsConfig({
+       if (action === "remove") {
+         setSelected(next.packages[0] ? packageKey(next.packages[0]) : null);
+         if (next.packages.length === 0) setAddMode(true);
+-        setActionMessage("Package removed.");
++        setActionMessage(t("Package removed."));
+       } else {
+         const messages: Record<Exclude<PluginAction, "remove">, string> = {
+-          install: "Package installed.",
+-          update: "Package updated.",
+-          disable: "Package disabled.",
+-          enable: "Package enabled.",
++          install: t("Package installed."),
++          update: t("Package updated."),
++          disable: t("Package disabled."),
++          enable: t("Package enabled."),
+         };
+         setActionMessage(messages[action]);
+       }
+@@ -664,7 +665,7 @@ export function PluginsConfig({
+       setSelected(installed ? packageKey(installed) : key);
+       setAddMode(false);
+       setInstallSource("");
+-      setActionMessage("Package installed.");
++      setActionMessage(t("Package installed."));
+     } catch (err) {
+       setActionError(err instanceof Error ? err.message : String(err));
+     } finally {
+@@ -681,7 +682,7 @@ export function PluginsConfig({
+       await sendAgentCommand(sessionId, { type: "reload" });
+       onReloaded?.();
+       await loadPlugins();
+-      setActionMessage("Session reloaded.");
++      setActionMessage(t("Session reloaded."));
+     } catch (err) {
+       setActionError(err instanceof Error ? err.message : String(err));
+     } finally {
+@@ -733,7 +734,7 @@ export function PluginsConfig({
+         >
+           <div style={{ display: "flex", alignItems: "baseline", gap: 10, minWidth: 0 }}>
+             <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>
+-              Plugins
++              {t("Plugins")}
+             </span>
+             <code
+               style={{
+@@ -780,7 +781,7 @@ export function PluginsConfig({
+             <div style={{ flex: 1, overflowY: "auto", padding: "8px 6px" }}>
+               {loading ? (
+                 <div style={{ padding: "10px 8px", fontSize: 12, color: "var(--text-muted)" }}>
+-                  Loading...
++                  {t("Loading...")}
+                 </div>
+               ) : error ? (
+                 <div style={{ padding: "10px 8px", fontSize: 11, color: "#ef4444" }}>
+@@ -788,7 +789,7 @@ export function PluginsConfig({
+                 </div>
+               ) : packages.length === 0 ? (
+                 <div style={{ padding: "10px 8px", fontSize: 11, color: "var(--text-dim)" }}>
+-                  No plugins configured
++                  {t("No plugins configured")}
+                 </div>
+               ) : (
+                 groupedPackages.map((group) => (
+@@ -930,7 +931,7 @@ export function PluginsConfig({
+                   <line x1="12" y1="5" x2="12" y2="19" />
+                   <line x1="5" y1="12" x2="19" y2="12" />
+                 </svg>
+-                Add plugin
++                {t("Add plugin")}
+               </button>
+             </div>
+           </div>
+@@ -970,7 +971,7 @@ export function PluginsConfig({
+                   fontSize: 13,
+                 }}
+               >
+-                Select a package
++                {t("Select a package")}
+               </div>
+             )}
+           </div>
+@@ -1002,10 +1003,10 @@ export function PluginsConfig({
+             )}
+           </div>
+           <button onClick={() => void loadPlugins()} disabled={loading || busyKey !== null} style={buttonStyle(loading || busyKey !== null)}>
+-            Refresh
++            {t("Refresh")}
+           </button>
+           <button onClick={onClose} style={buttonStyle(false)}>
+-            Close
++            {t("Close")}
+           </button>
+         </div>
+       </div>
+diff --git a/components/SessionSidebar.tsx b/components/SessionSidebar.tsx
+index 3ee17c4..d47d3fe 100644
+--- a/components/SessionSidebar.tsx
++++ b/components/SessionSidebar.tsx
+@@ -3,6 +3,7 @@
+ import { useEffect, useLayoutEffect, useState, useCallback, useRef, type CSSProperties, type ReactNode } from "react";
+ import type { SessionInfo } from "@/lib/types";
+ import { FileExplorer, type FileExplorerHandle } from "./FileExplorer";
++import { t } from "@/lib/i18n";
+ 
+ declare global {
+   interface Window {
+@@ -73,17 +74,16 @@ function saveUnreadSessionIds(ids: Set<string>): void {
+ }
+ 
+ function formatRelativeTime(dateStr: string): string {
+-  const date = new Date(dateStr);
++  const d = new Date(dateStr);
+   const now = new Date();
+-  const diff = now.getTime() - date.getTime();
+-  const mins = Math.floor(diff / 60000);
+-  const hours = Math.floor(diff / 3600000);
+-  const days = Math.floor(diff / 86400000);
+-  if (mins < 1) return "just now";
+-  if (mins < 60) return `${mins}m ago`;
+-  if (hours < 24) return `${hours}h ago`;
+-  if (days < 7) return `${days}d ago`;
+-  return date.toLocaleDateString();
++  const mins = Math.floor((now.getTime() - d.getTime()) / 60000);
++  const hours = Math.floor(mins / 60);
++  const days = Math.floor(hours / 24);
++  if (mins < 1) return t("just now");
++  if (mins < 60) return `${mins}${t("m ago")}`;
++  if (hours < 24) return `${hours}${t("h ago")}`;
++  if (days < 7) return `${days}${t("d ago")}`;
++  return d.toLocaleDateString("zh-CN");
+ }
+ 
+ /**
+@@ -754,20 +754,20 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+     && !showWorktreeSwitcher
+     ? (worktreeState.isGit
+         ? {
+-            label: "Open repo root",
+-            title: "Open the repository root to manage worktrees.",
++            label: t("Open repo root"),
++            title: t("Open the repository root to manage worktrees."),
+           }
+         : {
+-            label: "Git repo root only",
+-            title: "Worktrees are available in Git repository roots.",
++            label: t("Git repo root only"),
++            title: t("Worktrees are available in Git repository roots."),
+           })
+     : null;
+   const worktreeLoading = Boolean(selectedCwd && worktreeLoadingCwd === selectedCwd);
+   const inactiveWorktreeSelector = worktreeGuide
+     ?? (worktreeLoading && !showWorktreeSwitcher
+       ? {
+-          label: "Worktrees...",
+-          title: "Checking worktrees for this directory.",
++          label: t("Worktrees..."),
++          title: t("Checking worktrees for this directory."),
+         }
+       : null);
+ 
+@@ -806,7 +806,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                 flexShrink: 0,
+                 transition: "background 0.12s, color 0.12s, border-color 0.12s",
+               }}
+-              title={selectedCwd ? `New session in ${selectedCwd}` : "Select a project first"}
++              title={selectedCwd ? `${t("New session in")} ${selectedCwd}` : t("Select a project first")}
+               onMouseEnter={(e) => {
+                 if (!selectedCwd) return;
+                 e.currentTarget.style.background = "var(--bg-selected)";
+@@ -823,7 +823,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                 <line x1="6" y1="1" x2="6" y2="11" />
+                 <line x1="1" y1="6" x2="11" y2="6" />
+               </svg>
+-              New
++              {t("New")}
+             </button>
+             <button
+               onClick={() => loadSessions(false)}
+@@ -851,7 +851,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                 e.currentTarget.style.color = "var(--text-muted)";
+                 e.currentTarget.style.borderColor = "var(--border)";
+               }}
+-              title="Refresh"
++              title={t("Refresh")}
+             >
+               {sessionRefreshDone ? (
+                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+@@ -909,7 +909,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                   color: "var(--text-dim)",
+                 }}
+               >
+-                {initialSessionId && !restoredRef.current ? "" : "Select project…"}
++                {initialSessionId && !restoredRef.current ? "" : t("Select project…")}
+               </span>
+             )}
+           </button>
+@@ -940,7 +940,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                         setDropdownOpen(false);
+                       }
+                     }}
+-                    placeholder="Filter projects…"
++                    placeholder={t("Filter projects…")}
+                     autoFocus
+                     style={{
+                       width: "100%",
+@@ -999,7 +999,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                   </button>
+                 ))}
+                 {visibleProjects.length === 0 && projectFilter.trim() && (
+-                  <div style={{ padding: "8px 10px", fontSize: 11, color: "var(--text-dim)" }}>No matching projects</div>
++                  <div style={{ padding: "8px 10px", fontSize: 11, color: "var(--text-dim)" }}>{t("No matching projects")}</div>
+                 )}
+               </div>
+ 
+@@ -1025,7 +1025,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                     <path d="M1 3A1 1 0 0 1 2 2H4L5 3.5H8.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-7A.5.5 0 0 1 1 8V3Z" />
+                   </svg>
+-                  <span>Use default directory</span>
++                  <span>{t("Use default directory")}</span>
+                 </button>
+               )}
+ 
+@@ -1054,7 +1054,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                     <line x1="5" y1="1" x2="5" y2="9" />
+                     <line x1="1" y1="5" x2="9" y2="5" />
+                   </svg>
+-                  <span>Custom path…</span>
++                  <span>{t("Custom path…")}</span>
+                 </button>
+               ) : (
+                 <div style={{ padding: "6px 8px", borderTop: visibleProjects.length > 0 ? "none" : undefined }}>
+@@ -1118,7 +1118,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                         opacity: customPathValidating || !customPathValue.trim() ? 0.65 : 1,
+                       }}
+                     >
+-                      {customPathValidating ? "Checking…" : "Open"}
++                      {customPathValidating ? t("Checking…") : t("Open")}
+                     </button>
+                     <button
+                       onClick={() => { setCustomPathOpen(false); setCustomPathValue(""); setCustomPathError(null); }}
+@@ -1133,7 +1133,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                         cursor: "pointer",
+                       }}
+                     >
+-                      Cancel
++                      {t("Cancel")}
+                     </button>
+                   </div>
+                 </div>
+@@ -1156,7 +1156,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+             <div ref={wtDropdownRef} style={{ position: "relative", marginTop: 6 }}>
+               <button
+                 onClick={() => setWtDropdownOpen((v) => !v)}
+-                title={currentWt ? `Switch worktree: ${currentWt.path}` : "Switch worktree"}
++                title={currentWt ? `${t("Switch worktree:")} ${currentWt.path}` : t("Switch worktree")}
+                 style={{
+                   width: "100%",
+                   height: 29,
+@@ -1186,7 +1186,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                   style={{ flex: 1, fontFamily: "var(--font-mono)", color: "var(--text)" }}
+                 />
+                 {currentWt?.isMain && (
+-                  <span style={{ flexShrink: 0, color: "var(--text-dim)", fontSize: 10 }}>main</span>
++                  <span style={{ flexShrink: 0, color: "var(--text-dim)", fontSize: 10 }}>{t("main")}</span>
+                 )}
+                 {worktreeState.worktrees.length > 1 && (
+                   <span style={{ flexShrink: 0, color: "var(--text-dim)", fontSize: 10 }}>
+@@ -1220,20 +1220,20 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                         return (
+                           <div key={wt.path} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 10px", borderBottom: "1px solid var(--border)", background: "rgba(239,68,68,0.06)" }}>
+                             <span style={{ flex: 1, fontSize: 11, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+-                              Uncommitted changes. Force remove checkout?
++                              {t("Uncommitted changes. Force remove checkout?")}
+                             </span>
+                             <button
+                               onClick={() => void handleRemoveWorktree(wt.path, true)}
+                               disabled={wtBusy}
+                               style={{ padding: "3px 9px", background: "#ef4444", border: "none", borderRadius: 5, color: "#fff", fontSize: 11, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+                             >
+-                              Force
++                              {t("Force")}
+                             </button>
+                             <button
+                               onClick={() => setWtConfirmRemove(null)}
+                               style={{ padding: "3px 9px", background: "var(--bg-hover)", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", fontSize: 11, cursor: "pointer", flexShrink: 0 }}
+                             >
+-                              Cancel
++                              {t("Cancel")}
+                             </button>
+                           </div>
+                         );
+@@ -1275,13 +1275,13 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                               <span style={{ width: 10, flexShrink: 0 }} />
+                             )}
+                             <PathLabel text={wt.branch ?? displayCwd(wt.path, homeDir)} style={{ flex: 1 }} />
+-                            {wt.isMain && <span style={{ flexShrink: 0, color: "var(--text-dim)", fontSize: 10 }}>main</span>}
++                            {wt.isMain && <span style={{ flexShrink: 0, color: "var(--text-dim)", fontSize: 10 }}>{t("main")}</span>}
+                           </button>
+                           {!wt.isMain && (
+                             <button
+                               onClick={() => void handleRemoveWorktree(wt.path, false)}
+                               disabled={wtBusy}
+-                              title={`Remove worktree checkout ${wt.path}; the branch is kept`}
++                              title={`${t("Remove worktree checkout")} ${wt.path}; ${t("the branch is kept")}`}
+                               style={{
+                                 display: "flex", alignItems: "center", justifyContent: "center",
+                                 width: 34, height: 28, padding: 0, marginRight: 4,
+@@ -1314,7 +1314,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                         setWtError(null);
+                         setTimeout(() => wtNewInputRef.current?.focus(), 0);
+                       }}
+-                      title="Create a worktree checkout for a branch"
++                      title={t("Create a worktree checkout for a branch")}
+                       style={{
+                         display: "flex",
+                         alignItems: "center",
+@@ -1333,7 +1333,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                         <line x1="5" y1="1" x2="5" y2="9" />
+                         <line x1="1" y1="5" x2="9" y2="5" />
+                       </svg>
+-                      <span>New worktree…</span>
++                      <span>{t("New worktree…")}</span>
+                     </button>
+                   ) : (
+                     <div style={{ padding: "6px 8px" }}>
+@@ -1355,7 +1355,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                             setWtError(null);
+                           }
+                         }}
+-                        placeholder="branch name"
++                        placeholder={t("branch name")}
+                         style={{
+                           width: "100%",
+                           fontSize: 11,
+@@ -1386,7 +1386,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                             opacity: wtBusy || !wtNewBranch.trim() ? 0.65 : 1,
+                           }}
+                         >
+-                          {wtBusy ? "Creating…" : "Create"}
++                          {wtBusy ? t("Creating…") : t("Create")}
+                         </button>
+                         <button
+                           onClick={() => { setWtNewOpen(false); setWtNewBranch(""); setWtError(null); }}
+@@ -1401,7 +1401,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                             cursor: "pointer",
+                           }}
+                         >
+-                          Cancel
++                          {t("Cancel")}
+                         </button>
+                       </div>
+                     </div>
+@@ -1463,7 +1463,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+       <div style={{ flex: explorerOpen && (selectedCwdProp || selectedCwd) ? "1 1 0" : "1 1 auto", overflowY: "auto", padding: "0", minHeight: 80 }}>
+         {loading && (
+           <div style={{ padding: "16px 14px", color: "var(--text-muted)", fontSize: 12 }}>
+-            Loading...
++            {t("Loading...")}
+           </div>
+         )}
+         {error && (
+@@ -1473,7 +1473,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+         )}
+         {!loading && !error && filteredSessions.length === 0 && (
+           <div style={{ padding: "16px 14px", color: "var(--text-muted)", fontSize: 12 }}>
+-            No sessions found
++            {t("No sessions found")}
+           </div>
+         )}
+         {sessionTree.map((node) => (
+@@ -1533,14 +1533,14 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+               >
+                 <polyline points="3 2 7 5 3 8" />
+               </svg>
+-              Explorer
++              {t("Explorer")}
+             </button>
+             {explorerOpen && (
+               <button
+                 onClick={() => fileExplorerRef.current?.openUploadPicker()}
+                 disabled={explorerUploadBusy}
+-                title="Upload files to project root"
+-                aria-label="Upload files"
++                title={t("Upload files to project root")}
++                aria-label={t("Upload files")}
+                 style={{
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   width: 26, height: 26, padding: 0,
+@@ -1571,7 +1571,7 @@ export function SessionSidebar({ selectedSessionId, onSelectSession, onNewSessio
+                 if (explorerRefreshTimerRef.current) clearTimeout(explorerRefreshTimerRef.current);
+                 explorerRefreshTimerRef.current = setTimeout(() => setExplorerRefreshDone(false), 2000);
+               }}
+-              title="Refresh explorer"
++              title={t("Refresh explorer")}
+               style={{
+                 display: "flex", alignItems: "center", justifyContent: "center",
+                 width: 26, height: 26, padding: 0, marginRight: 6,
+@@ -1691,8 +1691,8 @@ function SessionTreeItem({
+ function RunningSessionIndicator() {
+   return (
+     <span
+-      title="Agent running…"
+-      aria-label="Agent running"
++      title={t("Agent running…")}
++      aria-label={t("Agent running")}
+       style={{
+         width: 14,
+         height: 14,
+@@ -1728,8 +1728,8 @@ function RunningSessionIndicator() {
+ function UnreadSessionIndicator() {
+   return (
+     <span
+-      title="New activity"
+-      aria-label="New session activity"
++      title={t("New activity")}
++      aria-label={t("New session activity")}
+       style={{
+         width: 14,
+         height: 14,
+@@ -1881,7 +1881,7 @@ function SessionItem({
+                 <path d="M10 11v6M14 11v6" />
+                 <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+               </svg>
+-              Delete
++              {t("Delete")}
+             </button>
+             <button
+               onClick={handleDeleteCancel}
+@@ -1894,7 +1894,7 @@ function SessionItem({
+                 whiteSpace: "nowrap",
+               }}
+             >
+-              Cancel
++              {t("Cancel")}
+             </button>
+           </div>
+         </>
+@@ -1963,7 +1963,7 @@ function SessionItem({
+               <span>{session.messageCount} msgs</span>
+               {session.worktreeBranch && (
+                 <span
+-                  title={`Worktree: ${session.cwd}`}
++                  title={`${t("Worktree:")} ${session.cwd}`}
+                   style={{ display: "flex", alignItems: "center", gap: 3, color: "var(--accent)", minWidth: 0, overflow: "hidden" }}
+                 >
+                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+@@ -1982,7 +1982,7 @@ function SessionItem({
+           {hasChildren && (
+             <button
+               onClick={(e) => { e.stopPropagation(); onToggleCollapse?.(); }}
+-              title={collapsed ? "Expand forks" : "Collapse forks"}
++              title={collapsed ? t("Expand forks") : t("Collapse forks")}
+               style={{
+                 display: "flex", alignItems: "center", justifyContent: "center",
+                 width: 20, height: 20, padding: 0, flexShrink: 0,
+@@ -2003,7 +2003,7 @@ function SessionItem({
+             <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+               <button
+                 onClick={startRename}
+-                title="Rename"
++                title={t("Rename")}
+                 style={{
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   width: 32, height: 32, padding: 0,
+@@ -2029,7 +2029,7 @@ function SessionItem({
+               </button>
+               <button
+                 onClick={handleDeleteClick}
+-                title="Delete"
++                title={t("Delete")}
+                 style={{
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   width: 32, height: 32, padding: 0,
+diff --git a/components/SkillsConfig.tsx b/components/SkillsConfig.tsx
+index beb7fb9..42ec845 100644
+--- a/components/SkillsConfig.tsx
++++ b/components/SkillsConfig.tsx
+@@ -8,6 +8,7 @@ import type {
+   SkillSearchResult,
+   SkillUpdateResult,
+ } from "@/lib/api-types";
++import { t } from "@/lib/i18n";
+ 
+ function shortenPath(p: string): string {
+   // Match common home dir patterns: /Users/xxx, /home/xxx
+@@ -47,8 +48,8 @@ function Toggle({
+       disabled={loading}
+       title={
+         enabled
+-          ? "Visible in model prompt — click to disable"
+-          : "Hidden from model prompt — click to enable"
++          ? t("Visible in model prompt — click to disable")
++          : t("Hidden from model prompt — click to enable")
+       }
+       style={{
+         flexShrink: 0,
+@@ -167,7 +168,7 @@ function SkillDetail({
+           <span
+             style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}
+           >
+-            Source
++            {t("Source")}
+           </span>
+           <a
+             href={skill.install.skillsShUrl}
+@@ -204,7 +205,7 @@ function SkillDetail({
+           <span
+             style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}
+           >
+-            Version
++            {t("Version")}
+           </span>
+           <div
+             style={{
+@@ -238,7 +239,7 @@ function SkillDetail({
+                   fontSize: 11,
+                 }}
+               >
+-                Check
++                {t("Check")}
+               </button>
+             )}
+             {updateStatus?.state === "update-available" && (
+@@ -267,12 +268,12 @@ function SkillDetail({
+                 }}
+               >
+                 {checkingUpdate
+-                  ? "Checking..."
++                  ? t("Checking...")
+                   : updateStatus?.state === "up-to-date"
+-                    ? "Up to date"
++                    ? t("Up to date")
+                     : updateStatus?.state === "unsupported"
+-                        ? "Automatic checks unavailable"
+-                        : updateStatus?.message || "Check failed"}
++                        ? t("Automatic checks unavailable")
++                        : updateStatus?.message || t("Check failed")}
+               </span>
+             )}
+             {updateStatus?.state === "update-available" && (
+@@ -291,7 +292,7 @@ function SkillDetail({
+                   fontWeight: 600,
+                 }}
+               >
+-                {updating ? "Updating..." : "Update"}
++                {updating ? t("Updating...") : t("Update")}
+               </button>
+             )}
+           </div>
+@@ -305,7 +306,7 @@ function SkillDetail({
+         <span
+           style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}
+         >
+-          Name
++          {t("Name")}
+         </span>
+         <span
+           style={{
+@@ -322,7 +323,7 @@ function SkillDetail({
+         <span
+           style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}
+         >
+-          Description
++          {t("Description")}
+         </span>
+         <span
+           style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6 }}
+@@ -379,7 +380,7 @@ function AddSkillPanel({
+         return;
+       }
+       setResults(d.results ?? []);
+-      if ((d.results ?? []).length === 0) setSearchError("No skills found");
++      if ((d.results ?? []).length === 0) setSearchError(t("No skills found"));
+     } catch (e) {
+       setSearchError(String(e));
+     } finally {
+@@ -432,7 +433,7 @@ function AddSkillPanel({
+         }}
+       >
+         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
+-          Add Skill
++          {t("Add Skill")}
+         </div>
+ 
+         {/* Search row */}
+@@ -444,7 +445,7 @@ function AddSkillPanel({
+             onKeyDown={(e) => {
+               if (e.key === "Enter") search(query);
+             }}
+-            placeholder="e.g. react, testing, deploy"
++            placeholder={t("e.g. react, testing, deploy")}
+             style={{
+               flex: 1,
+               padding: "7px 10px",
+@@ -471,7 +472,7 @@ function AddSkillPanel({
+               flexShrink: 0,
+             }}
+           >
+-            {searching ? "Searching…" : "Search"}
++            {searching ? t("Searching…") : t("Search")}
+           </button>
+         </div>
+ 
+@@ -637,10 +638,10 @@ function AddSkillPanel({
+                   }}
+                 >
+                   {isInstalled
+-                    ? "✓ Installed"
++                    ? t("✓ Installed")
+                     : isInstalling
+-                      ? "Installing…"
+-                      : "Install"}
++                      ? t("Installing…")
++                      : t("Install")}
+                 </button>
+               </div>
+             );
+@@ -652,7 +653,7 @@ function AddSkillPanel({
+           <div
+             style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.8 }}
+           >
+-            Search{" "}
++            {t("Search")}{" "}
+             <a
+               href="https://skills.sh"
+               target="_blank"
+@@ -661,7 +662,7 @@ function AddSkillPanel({
+             >
+               skills.sh
+             </a>{" "}
+-            to discover and install skills for your agent.
++            {t("to discover and install skills for your agent.")}
+           </div>
+         )
+       )}
+@@ -886,7 +887,7 @@ export function SkillsConfig({
+             <span
+               style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}
+             >
+-              Skills
++              {t("Skills")}
+             </span>
+             <code
+               style={{
+@@ -942,7 +943,7 @@ export function SkillsConfig({
+                     color: "var(--text-muted)",
+                   }}
+                 >
+-                  Loading…
++                  {t("Loading…")}
+                 </div>
+               ) : error ? (
+                 <div
+@@ -962,14 +963,14 @@ export function SkillsConfig({
+                     color: "var(--text-dim)",
+                   }}
+                 >
+-                  No skills found
++                  {t("No skills found")}
+                 </div>
+               ) : (
+                 (() => {
+                   const groups: { label: string; skills: typeof skills }[] = [];
+                   const groupDefinitions = [
+                     {
+-                      label: "project / skills.sh",
++                      label: t("project / skills.sh"),
+                       matches: (skill: Skill) =>
+                         sourceLabel(skill) === "project" &&
+                         Boolean(skill.install?.skillsShUrl),
+@@ -981,7 +982,7 @@ export function SkillsConfig({
+                         !skill.install?.skillsShUrl,
+                     },
+                     {
+-                      label: "global / skills.sh",
++                      label: t("global / skills.sh"),
+                       matches: (skill: Skill) =>
+                         sourceLabel(skill) === "global" &&
+                         Boolean(skill.install?.skillsShUrl),
+@@ -1087,7 +1088,7 @@ export function SkillsConfig({
+                                 if (status?.state !== "update-available") return null;
+                                 return (
+                                   <span
+-                                    title="Update available"
++                                    title={t("Update available")}
+                                     style={{
+                                       color: "#d97706",
+                                       fontSize: 13,
+@@ -1150,7 +1151,7 @@ export function SkillsConfig({
+                   <line x1="12" y1="5" x2="12" y2="19" />
+                   <line x1="5" y1="12" x2="19" y2="12" />
+                 </svg>
+-                Add skill
++                {t("Add skill")}
+               </div>
+             </div>
+           </div>
+@@ -1210,7 +1211,7 @@ export function SkillsConfig({
+                   fontSize: 13,
+                 }}
+               >
+-                Select a skill
++                {t("Select a skill")}
+               </div>
+             )}
+           </div>
+@@ -1246,7 +1247,7 @@ export function SkillsConfig({
+                   fontSize: 12,
+                 }}
+               >
+-                {checkingAll ? "Checking..." : "Check updates"}
++                {checkingAll ? t("Checking...") : t("Check updates")}
+               </button>
+             )}
+             {Object.values(updateStatuses).filter(
+@@ -1278,7 +1279,7 @@ export function SkillsConfig({
+               fontSize: 13,
+             }}
+           >
+-            Close
++            {t("Close")}
+           </button>
+         </div>
+       </div>
+diff --git a/components/TabBar.tsx b/components/TabBar.tsx
+index 3d131cc..758a88f 100644
+--- a/components/TabBar.tsx
++++ b/components/TabBar.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useState } from "react";
+ import { getFileIcon } from "./FileIcons";
++import { t } from "@/lib/i18n";
+ 
+ export interface Tab {
+   id: string;
+@@ -96,8 +97,8 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: Props) {
+                 flexShrink: 0,
+                 transition: "background 0.1s, color 0.1s",
+               }}
+-              title="Close"
+-              aria-label={`Close ${tab.label}`}
++              title={t("Close")}
++              aria-label={`${t("Close")} ${tab.label}`}
+             >
+               <svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                 <line x1="2" y1="2" x2="8" y2="8" />
+diff --git a/hooks/useAgentSession.ts b/hooks/useAgentSession.ts
+index d842183..7fc6008 100644
+--- a/hooks/useAgentSession.ts
++++ b/hooks/useAgentSession.ts
+@@ -13,6 +13,7 @@ import { normalizeToolCalls } from "@/lib/normalize";
+ import { sendAgentCommand } from "@/lib/agent-client";
+ import { getToolNamesForPreset, type ToolEntry } from "@/lib/tool-presets";
+ import type { SessionStatsInfo } from "@/lib/pi-types";
++import { t } from "@/lib/i18n";
+ 
+ export interface SessionData {
+   sessionId: string;
+@@ -177,8 +178,8 @@ type EventStreamConnectionResult = {
+ class EventStreamConnectionError extends Error {
+   constructor(public readonly status: Exclude<EventStreamConnectionStatus, "connected">) {
+     super(status === "timeout"
+-      ? "Timed out connecting to the agent event stream. Please try again."
+-      : "Failed to connect to the agent event stream. Please try again.");
++      ? t("Timed out connecting to the agent event stream. Please try again.")
++      : t("Failed to connect to the agent event stream. Please try again."));
+     this.name = "EventStreamConnectionError";
+   }
+ }
+@@ -481,7 +482,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         }
+         return agentState;
+       } catch (e) {
+-        console.error("Failed to load agent state:", e);
++        console.error(t("Failed to load agent state:"), e);
+         return null;
+       }
+     } catch (e) {
+@@ -503,7 +504,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       setMessages(d.context.messages);
+       setEntryIds(d.context.entryIds ?? []);
+     } catch (e) {
+-      console.error("Failed to load context:", e);
++      console.error(t("Failed to load context:"), e);
+     }
+   }, []);
+ 
+@@ -515,7 +516,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         setToolPresetState(getPresetFromTools(tools));
+       }
+     } catch (e) {
+-      console.error("Failed to load tools:", e);
++      console.error(t("Failed to load tools:"), e);
+     }
+   }, [setToolPresetState]);
+ 
+@@ -583,7 +584,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       setSlashCommands(commands);
+       return commands;
+     } catch (e) {
+-      console.error("Failed to load slash commands:", e);
++      console.error(t("Failed to load slash commands:"), e);
+       setSlashCommands([]);
+       return [] as SlashCommandInfo[];
+     } finally {
+@@ -660,7 +661,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         ...response,
+       });
+     } catch (e) {
+-      console.error("Failed to send extension UI response:", e);
++      console.error(t("Failed to send extension UI response:"), e);
+     }
+   }, []);
+ 
+@@ -674,7 +675,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         data,
+       });
+     } catch (e) {
+-      console.error("Failed to send extension custom UI input:", e);
++      console.error(t("Failed to send extension custom UI input:"), e);
+     }
+   }, []);
+ 
+@@ -828,7 +829,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       if (promptRunIdRef.current !== runId) return;
+       const state = data.state;
+       // Mirror compaction state unconditionally: a missed compaction_end
+-      // would otherwise leave the "Stop compaction" UI stuck. No state
++      // would otherwise leave the t("Stop compaction") UI stuck. No state
+       // (wrapper destroyed) means nothing is compacting.
+       setIsCompacting(state?.isCompacting ?? false);
+       setQueuedMessages(normalizeQueuedMessages(state?.queuedMessages));
+@@ -914,12 +915,12 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         void finishPromptWithoutStream(sessionIdRef.current);
+         break;
+       case "prompt_error":
+-        addNotice({ type: "error", message: (event.errorMessage as string | undefined) ?? "Command failed" });
++        addNotice({ type: "error", message: (event.errorMessage as string | undefined) ?? t("Command failed") });
+         break;
+       case "extension_error":
+         addNotice({
+           type: "error",
+-          message: (event.error as string | undefined) ?? "Extension command failed",
++          message: (event.error as string | undefined) ?? t("Extension command failed"),
+         });
+         break;
+       case "message_start":
+@@ -1098,7 +1099,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         void waitForPromptSettlement(sentSessionId, promptRunId);
+       }
+     } catch (e) {
+-      console.error("Failed to send message:", e);
++      console.error(t("Failed to send message:"), e);
+       if (e instanceof EventStreamConnectionError) {
+         const optimisticKey = optimisticUserMessageKeyRef.current;
+         if (optimisticKey) {
+@@ -1127,7 +1128,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+     setBashRunning(true);
+     try {
+       const sid = sessionIdRef.current ?? session?.id ?? await ensureNewSession();
+-      if (!sid) throw new Error("Unable to create a session for the shell command");
++      if (!sid) throw new Error(t("Unable to create a session for the shell command"));
+       await sendAgentCommand(sid, {
+         type: "bash",
+         command,
+@@ -1136,7 +1137,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       await loadSession(sid);
+       promoteNewSession(1, inputText);
+     } catch (e) {
+-      console.error("Failed to execute shell command:", e);
++      console.error(t("Failed to execute shell command:"), e);
+       addNotice({ type: "error", message: e instanceof Error ? e.message : String(e) });
+       opts.chatInputRef?.current?.insertIfEmpty(inputText);
+     } finally {
+@@ -1154,14 +1155,14 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       try {
+         await sendAgentCommand(sid, { type: "abort_bash" });
+       } catch (e) {
+-        console.error("Failed to abort bash:", e);
++        console.error(t("Failed to abort bash:"), e);
+       }
+       return;
+     }
+     try {
+       await sendAgentCommand(sid, { type: "abort" });
+     } catch (e) {
+-      console.error("Failed to abort:", e);
++      console.error(t("Failed to abort:"), e);
+     }
+   }, []);
+ 
+@@ -1180,7 +1181,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         onSessionForked?.(newSessionId);
+       }
+     } catch (e) {
+-      console.error("Fork failed:", e);
++      console.error(t("Fork failed:"), e);
+     } finally {
+       setForkingEntryId(null);
+     }
+@@ -1215,7 +1216,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       try {
+         await sendAgentCommand(sid, { type: "set_model", provider, modelId });
+       } catch (e) {
+-        console.error("Failed to set model:", e);
++        console.error(t("Failed to set model:"), e);
+       }
+       return;
+     }
+@@ -1225,7 +1226,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       await sendAgentCommand(sid, { type: "set_model", provider, modelId });
+       setCurrentModelOverride({ provider, modelId });
+     } catch (e) {
+-      console.error("Failed to set model:", e);
++      console.error(t("Failed to set model:"), e);
+     }
+   }, [isNew, setNewSessionModel]);
+ 
+@@ -1280,7 +1281,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+       if (result.error) {
+         addNotice({ type: "error", message: result.error });
+       } else if (result.action !== "openSessionStats") {
+-        addNotice({ type: "success", message: result.message ?? "Command completed" });
++        addNotice({ type: "success", message: result.message ?? t("Command completed") });
+       }
+       return result;
+     };
+@@ -1288,7 +1289,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+     try {
+       switch (commandName) {
+         case "compact": {
+-          if (!sid || isCompacting) return complete({ handled: true, error: "No active session to compact" });
++          if (!sid || isCompacting) return complete({ handled: true, error: t("No active session to compact") });
+           setIsCompacting(true);
+           setCompactError(null);
+           setCompactResult(null);
+@@ -1298,11 +1299,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+           });
+           setCompactResult(readCompactResult(result, "manual"));
+           if (await loadSession(sid, true)) promoteNewSession();
+-          return complete({ handled: true, message: "Compacted context" });
++          return complete({ handled: true, message: t("Compacted context") });
+         }
+ 
+         case "reload": {
+-          if (!sid) return complete({ handled: true, error: "No active session to reload" });
++          if (!sid) return complete({ handled: true, error: t("No active session to reload") });
+           await sendAgentCommand(sid, { type: "reload" });
+           await Promise.all([
+             loadSession(sid, false, true),
+@@ -1310,11 +1311,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+             loadSlashCommands(),
+             loadModels(),
+           ]);
+-          return complete({ handled: true, message: "Reloaded session resources" });
++          return complete({ handled: true, message: t("Reloaded session resources") });
+         }
+ 
+         case "name": {
+-          if (!sid) return complete({ handled: true, error: "No active session to name" });
++          if (!sid) return complete({ handled: true, error: t("No active session to name") });
+           if (!args) return complete({ handled: true, error: "Usage: /name <name>" });
+           await sendAgentCommand(sid, { type: "set_session_name", name: args });
+           if (await loadSession(sid)) promoteNewSession();
+@@ -1322,7 +1323,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         }
+ 
+         case "session": {
+-          if (!sid) return complete({ handled: true, error: "No active session" });
++          if (!sid) return complete({ handled: true, error: t("No active session") });
+           const stats = await sendAgentCommand<SessionStatsInfo>(sid, { type: "get_session_stats" });
+           if (stats) {
+             setSessionStatsOverride(stats);
+@@ -1332,12 +1333,12 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         }
+ 
+         case "copy": {
+-          if (!sid) return complete({ handled: true, error: "No active session" });
++          if (!sid) return complete({ handled: true, error: t("No active session") });
+           const data = await sendAgentCommand<LastAssistantTextResponse>(sid, { type: "get_last_assistant_text" });
+           const textToCopy = data?.text ?? "";
+-          if (!textToCopy) return complete({ handled: true, error: "No assistant message to copy" });
++          if (!textToCopy) return complete({ handled: true, error: t("No assistant message to copy") });
+           await navigator.clipboard.writeText(textToCopy);
+-          return complete({ handled: true, message: "Copied last assistant message" });
++          return complete({ handled: true, message: t("Copied last assistant message") });
+         }
+ 
+         default:
+@@ -1365,7 +1366,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         ...(piImages?.length ? { images: piImages } : {}),
+       });
+     } catch (e) {
+-      console.error("Failed to steer:", e);
++      console.error(t("Failed to steer:"), e);
+     }
+   }, []);
+ 
+@@ -1385,7 +1386,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         ...(piImages?.length ? { images: piImages } : {}),
+       });
+     } catch (e) {
+-      console.error("Failed to queue prompt:", e);
++      console.error(t("Failed to queue prompt:"), e);
+     }
+   }, []);
+ 
+@@ -1400,7 +1401,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         ...(piImages?.length ? { images: piImages } : {}),
+       });
+     } catch (e) {
+-      console.error("Failed to follow up:", e);
++      console.error(t("Failed to follow up:"), e);
+     }
+   }, []);
+ 
+@@ -1410,7 +1411,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+     try {
+       await sendAgentCommand(sid, { type: "abort_compaction" });
+     } catch (e) {
+-      console.error("Failed to abort compaction:", e);
++      console.error(t("Failed to abort compaction:"), e);
+     }
+   }, []);
+ 
+@@ -1427,8 +1428,8 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+         opts.chatInputRef?.current?.prependText(texts.join("\n\n"));
+       }
+     } catch (e) {
+-      console.error("Failed to recall queued messages:", e);
+-      addNotice({ type: "error", message: "Failed to recall queued messages" });
++      console.error(t("Failed to recall queued messages:"), e);
++      addNotice({ type: "error", message: t("Failed to recall queued messages") });
+     }
+   }, [opts.chatInputRef, addNotice]);
+ 
+@@ -1440,7 +1441,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+     try {
+       await sendAgentCommand(sid, { type: "set_thinking_level", level });
+     } catch (e) {
+-      console.error("Failed to set thinking level:", e);
++      console.error(t("Failed to set thinking level:"), e);
+     }
+   }, []);
+ 
+@@ -1452,7 +1453,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+     try {
+       await sendAgentCommand(sid, { type: "set_tools", toolNames });
+     } catch (e) {
+-      console.error("Failed to set tools:", e);
++      console.error(t("Failed to set tools:"), e);
+     }
+   }, [setToolPresetState]);
+ 
+diff --git a/lib/i18n.ts b/lib/i18n.ts
+new file mode 100644
+index 0000000..4072dad
+--- /dev/null
++++ b/lib/i18n.ts
+@@ -0,0 +1,534 @@
++/**
++ * Lightweight UI i18n for Pi Web.
++ * Default locale is Chinese (zh-CN). English keys are the source strings.
++ */
++
++export type Locale = "zh-CN" | "en";
++
++const STORAGE_KEY = "pi-web-locale";
++
++const zhCN: Record<string, string> = {
++  // App / layout
++  "Pi Web": "Pi Web",
++  "Pi Web interface for the pi coding agent": "pi 编程智能体的 Web 界面",
++
++  // Common actions
++  "Open": "打开",
++  "Save": "保存",
++  "Saved": "已保存",
++  "Saving…": "保存中…",
++  "Create": "创建",
++  "Creating…": "创建中…",
++  "Search": "搜索",
++  "Searching…": "搜索中…",
++  "Install": "安装",
++  "Installing…": "安装中…",
++  "Installing...": "安装中…",
++  "Update": "更新",
++  "Updating...": "更新中…",
++  "Updating…": "更新中…",
++  "Removing...": "移除中…",
++  "Removing…": "移除中…",
++  "Enable": "启用",
++  "Disable": "禁用",
++  "Copy": "复制",
++  "Copied": "已复制",
++  "Checking…": "检查中…",
++  "Checking...": "检查中…",
++  "Test": "测试",
++  "Testing…": "测试中…",
++  "Failed": "失败",
++  "Unknown": "未知",
++  "main": "主分支",
++  "OK": "确定",
++  "Login": "登录",
++  "Re-login": "重新登录",
++  "Connected": "已连接",
++  "Not found": "未找到",
++  "None": "无",
++  "File": "文件",
++  "ID": "ID",
++  "Status": "状态",
++  "Package": "包",
++  "Resources": "资源",
++  "Cwd": "工作目录",
++  "Provider": "提供商",
++  "Model": "模型",
++  "API": "API",
++  "API Key": "API 密钥",
++  "Base URL": "Base URL",
++  "Subscription": "订阅",
++  "Subscriptions": "订阅",
++  "OAuth": "OAuth",
++  "Before": "之前",
++  "After": "之后",
++  "Preview": "预览",
++  "Diff": "差异",
++  "Expand": "展开",
++  "Collapse": "折叠",
++  "Show details": "显示详情",
++  "Hide details": "隐藏详情",
++  "Copy message": "复制消息",
++  "Thinking": "思考",
++  "Branches": "分支",
++  "Chat": "对话",
++  "System": "系统",
++  "Compact": "压缩",
++  "Compacting…": "压缩中…",
++  "Queue": "排队",
++  "Inject": "注入",
++  "History": "历史",
++  "Tools": "工具",
++  "Models": "模型",
++  "Sessions": "会话",
++  "Worktrees": "工作树",
++  "Worktrees...": "工作树…",
++  "Worktrees…": "工作树…",
++
++  // AppShell
++  "Hide sidebar": "隐藏侧边栏",
++  "Show sidebar": "显示侧边栏",
++  "Switch to light mode": "切换到浅色模式",
++  "Switch to dark mode": "切换到深色模式",
++  "View full history": "查看完整历史",
++  "Full history is available after the session is saved": "会话保存后可查看完整历史",
++  "Full history": "完整历史",
++  "Generate title": "生成标题",
++  "Generate a session title": "生成会话标题",
++  "Title updated": "标题已更新",
++  "Generation failed": "生成失败",
++  "Title generation is available after the session is saved": "会话保存后可生成标题",
++  "Send a message before naming this session": "请先发送一条消息再命名会话",
++  "System prompt": "系统提示词",
++  "Session info": "会话信息",
++  "Session Info": "会话信息",
++  "Hide file panel": "隐藏文件面板",
++  "Show file panel": "显示文件面板",
++  "Opening workspace...": "正在打开工作区…",
++  "Unable to open workspace": "无法打开工作区",
++  "Get Started": "开始使用",
++  "Select a project directory from the sidebar": "从侧边栏选择一个项目目录",
++  "In-memory": "内存中",
++  "Copy file path": "复制文件路径",
++  "Copy session ID": "复制会话 ID",
++  "Context": "上下文",
++  "Cost": "花费",
++  "Tokens": "令牌",
++  "Messages": "消息",
++  "Input": "输入",
++  "Output": "输出",
++  "Cache Read": "缓存读取",
++  "Cache Write": "缓存写入",
++  "Total": "合计",
++  "User": "用户",
++  "Assistant": "助手",
++  "Tool Calls": "工具调用",
++  "Tool Results": "工具结果",
++
++  // SessionSidebar
++  "Select a project first": "请先选择项目",
++  "Select project…": "选择项目…",
++  "Filter projects…": "筛选项目…",
++  "No matching projects": "没有匹配的项目",
++  "Use default directory": "使用默认目录",
++  "Custom path…": "自定义路径…",
++  "Switch worktree": "切换工作树",
++  "Open repo root": "打开仓库根目录",
++  "Open the repository root to manage worktrees.": "打开仓库根目录以管理工作树。",
++  "Git repo root only": "仅 Git 仓库根目录",
++  "Worktrees are available in Git repository roots.": "仅在 Git 仓库根目录可用工作树。",
++  "Checking worktrees for this directory.": "正在检查此目录的工作树。",
++  "Create a worktree checkout for a branch": "为分支创建工作树检出",
++  "New worktree…": "新建工作树…",
++  "branch name": "分支名称",
++  "Upload files to project root": "上传文件到项目根目录",
++  "Upload files": "上传文件",
++  "Refresh explorer": "刷新资源管理器",
++  "Agent running…": "Agent 运行中…",
++  "Agent running": "Agent 运行中",
++  "New activity": "新活动",
++  "New session activity": "会话有新活动",
++  "Expand forks": "展开分叉",
++  "Collapse forks": "折叠分叉",
++  "just now": "刚刚",
++
++  // Chat
++  "Message… Type / for commands, @ for files": "输入消息… 用 / 调用命令，用 @ 引用文件",
++  "Steer now / queue follow-up...": "立即注入 / 排队后续消息…",
++  "Agent is running…": "Agent 运行中…",
++  "Attach image": "附加图片",
++  "More controls": "更多控件",
++  "Change reasoning level": "更改推理级别",
++  "Change tool preset": "更改工具预设",
++  "Compact context": "压缩上下文",
++  "Stop compaction": "停止压缩",
++  "Stop agent": "停止 Agent",
++  "Disable completion sound": "关闭完成提示音",
++  "Enable completion sound": "开启完成提示音",
++  "Collapse controls": "收起控件",
++  "Image attachments cannot be queued while the agent is running": "Agent 运行时无法排队图片附件",
++  "Interrupt the current run and inject this message now": "中断当前运行并立即注入此消息",
++  "Queue this message after the agent finishes": "在 Agent 完成后排队发送此消息",
++  "Remove all queued messages and put them back into the input box for editing": "移除所有排队消息并放回输入框编辑",
++  "Use pi default": "使用 pi 默认",
++  "Reasoning off": "关闭推理",
++  "Minimal reasoning": "最低推理",
++  "Low reasoning": "低推理",
++  "Medium reasoning": "中等推理",
++  "High reasoning": "高推理",
++  "Extra-high reasoning": "超高推理",
++  "Max reasoning": "最高推理",
++  "No tools, read-only": "无工具，只读",
++  "4 built-in tools": "4 个内置工具",
++  "All built-in tools": "全部内置工具",
++  "Built-in": "内置",
++  "Extensions": "扩展",
++  "Prompts": "提示词",
++  "Themes": "主题",
++  "Loading commands...": "加载命令中…",
++  "Loading files...": "加载文件中…",
++  "No matching files": "没有匹配的文件",
++  "Slash commands": "斜杠命令",
++  "Compress context, optionally with instructions": "压缩上下文，可选附加说明",
++  "Reload extensions, skills, prompts, and tools": "重新加载扩展、技能、提示词和工具",
++  "Set the session display name": "设置会话显示名称",
++  "Show session message, token, and cost stats": "显示会话消息、令牌和花费统计",
++  "Copy the last assistant message": "复制最后一条助手消息",
++  "Tab / Enter": "Tab / Enter",
++  "follow-up": "后续",
++  "output sent to model": "输出发送给模型",
++  "output stays local": "输出仅本地",
++  "Compacted": "已压缩",
++
++  // ChatWindow
++  "Running tool...": "正在运行工具…",
++  "Waiting for model...": "等待模型…",
++  "Running command...": "正在运行命令…",
++  "Running": "正在运行",
++  "matches": "个匹配",
++  "commands": "个命令",
++  "Process details": "过程详情",
++  "Collapse process details": "折叠过程详情",
++  "Expand process details": "展开过程详情",
++  "extension request": "扩展请求",
++  "Extension terminal input": "扩展终端输入",
++  "Extension panel": "扩展面板",
++
++  // MessageView
++  "Edit from here — branches within this session": "从此处编辑 — 在本会话内创建分支",
++  "New session — creates an independent copy from here": "新会话 — 从此处创建独立副本",
++  "New session": "新会话",
++  "Creating new session…": "正在创建新会话…",
++  "Estimated token count while streaming": "流式输出期间的估计令牌数",
++  "Modified files": "已修改文件",
++  "Read files": "已读取文件",
++  "hidden extension message": "隐藏的扩展消息",
++  "Show extension message": "显示扩展消息",
++  "Invalid thinking response": "无效的思考内容",
++  "Thinking content unavailable": "思考内容不可用",
++  "loading…": "加载中…",
++  "view full output": "查看完整输出",
++  "bash (local)": "bash（本地）",
++
++  // BranchNavigator
++  "No active session": "没有活动会话",
++  "This session has no branches": "此会话没有分支",
++
++  // FileExplorer / FileViewer
++  "Modified": "已修改",
++  "Added": "已添加",
++  "Deleted": "已删除",
++  "Renamed": "已重命名",
++  "Untracked": "未跟踪",
++  "Conflict": "冲突",
++  "Newly uploaded": "刚上传",
++  "Contains changed files": "包含已更改文件",
++  "Insert path into chat": "将路径插入对话",
++  "Download file": "下载文件",
++  "Checking files": "正在检查文件",
++  "Dismiss error": "关闭错误",
++  "Dismiss upload results": "关闭上传结果",
++  "Add uploaded file to chat": "将上传的文件加入对话",
++  "Add all uploaded files to chat": "将全部上传文件加入对话",
++  "Network error while uploading files": "上传文件时网络错误",
++  "Upload cancelled": "上传已取消",
++  "uploaded": "已上传",
++  "skipped": "已跳过",
++  "failed": "失败",
++  "Live sync active": "实时同步中",
++  "Not watching": "未监视",
++  "Compare working tree with HEAD": "将工作区与 HEAD 对比",
++  "Disable word wrap": "关闭自动换行",
++  "Enable word wrap": "开启自动换行",
++  "HTML preview": "HTML 预览",
++  "File view mode": "文件查看模式",
++  "Failed to load audio": "音频加载失败",
++  "Failed to load image": "图片加载失败",
++  "lines": "行",
++
++  // MarkdownBody
++  "Invalid Mermaid diagram": "无效的 Mermaid 图",
++  "Preview Mermaid diagram": "预览 Mermaid 图",
++  "Preview available after streaming": "流式输出结束后可预览",
++  "Show Mermaid source": "显示 Mermaid 源码",
++  "Rendering Mermaid diagram": "正在渲染 Mermaid 图",
++
++  // ModelsConfig
++  "Hide API key": "隐藏 API 密钥",
++  "Show API key": "显示 API 密钥",
++  "Test model connection": "测试模型连接",
++  "Thinking level map": "思考级别映射",
++  "Cost (per million tokens)": "费用（每百万令牌）",
++  "Opening browser…": "正在打开浏览器…",
++  "Connected successfully.": "连接成功。",
++  "Search providers…": "搜索提供商…",
++  "No providers match": "没有匹配的提供商",
++  "OpenAI / Anthropic compatible": "OpenAI / Anthropic 兼容",
++  "Custom endpoint format": "自定义端点格式",
++  "ID *": "ID *",
++  "Display name": "显示名称",
++  "Provider name": "提供商名称",
++  "API override": "API 覆盖",
++  "Context window (tokens)": "上下文窗口（令牌）",
++  "Max output tokens": "最大输出令牌",
++  "Image input": "图像输入",
++  "Reasoning / thinking": "推理 / 思考",
++  "DeepSeek thinking compat": "DeepSeek 思考兼容",
++  "Already connected. You can re-login or disconnect.": "已连接。可以重新登录或断开连接。",
++  "API key is stored. Enter a new key below to replace it, or disconnect to remove it.": "API 密钥已保存。在下方输入新密钥可替换，或断开连接以移除。",
++  "Complete sign-in in the browser, then copy the redirect URL from the address bar and paste it below.": "在浏览器中完成登录，然后从地址栏复制重定向 URL 并粘贴到下方。",
++  "Enter new key to replace…": "输入新密钥以替换…",
++  "Enter value…": "输入值…",
++  "Connection lost": "连接已断开",
++  "Continuing…": "继续中…",
++  "Verifying…": "验证中…",
++  "Network error": "网络错误",
++  "not configured": "未配置",
++  "not connected": "未连接",
++  "new model": "新模型",
++
++  // PluginsConfig
++  "No resources": "无资源",
++  "No resolved resources": "无已解析资源",
++  "Package disabled": "包已禁用",
++  "Enable package": "启用包",
++  "Disable package": "禁用包",
++  "Reload current session": "重新加载当前会话",
++  "Open a session to reload": "打开会话后可重新加载",
++  "Reload session": "重新加载会话",
++  "Reloading...": "重新加载中…",
++  "Package removed.": "包已移除。",
++  "Package installed.": "包已安装。",
++  "Package updated.": "包已更新。",
++  "Package disabled.": "包已禁用。",
++  "Package enabled.": "包已启用。",
++  "Session reloaded.": "会话已重新加载。",
++  "Installed path": "安装路径",
++
++  // SkillsConfig
++  "Visible in model prompt — click to disable": "对模型提示可见 — 点击禁用",
++  "Hidden from model prompt — click to enable": "对模型提示隐藏 — 点击启用",
++  "Up to date": "已是最新",
++  "Automatic checks unavailable": "无法自动检查",
++  "Check failed": "检查失败",
++  "Check updates": "检查更新",
++  "Update available": "有可用更新",
++  "e.g. react, testing, deploy": "例如 react、testing、deploy",
++  "project / skills.sh": "项目 / skills.sh",
++  "project": "项目",
++  "global / skills.sh": "全局 / skills.sh",
++  "global": "全局",
++  "path": "路径",
++  "✓ Installed": "✓ 已安装",
++
++  // TabBar
++  "Close tab": "关闭标签",
++
++  // Agent session messages
++  "Command completed": "命令已完成",
++  "Command failed": "命令失败",
++  "Compacted context": "已压缩上下文",
++  "Copied last assistant message": "已复制最后一条助手消息",
++  "Extension command failed": "扩展命令失败",
++  "Failed to abort bash:": "中止 bash 失败：",
++  "Failed to abort compaction:": "中止压缩失败：",
++  "Failed to abort:": "中止失败：",
++  "Failed to connect to the agent event stream. Please try again.": "无法连接 Agent 事件流，请重试。",
++  "Failed to execute shell command:": "执行 shell 命令失败：",
++  "Failed to follow up:": "发送后续消息失败：",
++  "Failed to load agent state:": "加载 Agent 状态失败：",
++  "Failed to load context:": "加载上下文失败：",
++  "Failed to load slash commands:": "加载斜杠命令失败：",
++  "Failed to load tools:": "加载工具失败：",
++  "Failed to queue prompt:": "排队提示失败：",
++  "Failed to recall queued messages": "恢复排队消息失败",
++  "Failed to recall queued messages:": "恢复排队消息失败：",
++  "Failed to send extension UI response:": "发送扩展 UI 响应失败：",
++  "Failed to send extension custom UI input:": "发送扩展自定义 UI 输入失败：",
++  "Failed to send message:": "发送消息失败：",
++  "Failed to set model:": "设置模型失败：",
++  "Failed to set thinking level:": "设置思考级别失败：",
++  "Failed to set tools:": "设置工具失败：",
++  "Failed to steer:": "注入消息失败：",
++  "Fork failed:": "分叉失败：",
++  "No active session to compact": "没有可压缩的活动会话",
++  "No active session to name": "没有可命名的活动会话",
++  "No active session to reload": "没有可重新加载的活动会话",
++  "No assistant message to copy": "没有可复制的助手消息",
++  "Reloaded session resources": "已重新加载会话资源",
++  "Timed out connecting to the agent event stream. Please try again.": "连接 Agent 事件流超时，请重试。",
++  "Unable to create a session for the shell command": "无法为 shell 命令创建会话",
++
++  // Relative time
++  "m ago": " 分钟前",
++  "h ago": " 小时前",
++  "d ago": " 天前",
++
++  // Misc dynamic fragments
++  "New session in": "在以下位置新建会话：",
++  "Switch worktree:": "切换工作树：",
++  "Remove worktree checkout": "移除工作树检出",
++  "the branch is kept": "分支会保留",
++  "Worktree:": "工作树：",
++  "Uploading,": "上传中，",
++  "Change reasoning level:": "更改推理级别：",
++  "Change tool preset:": "更改工具预设：",
++  "Close ": "关闭 ",
++  "Preview ": "预览 ",
++  "searching all files…": "正在搜索全部文件…",
++  "index truncated": "索引已截断",
++  "1 command": "1 个命令",
++  "1 match": "1 个匹配",
++  "message": "条消息",
++  "messages": "条消息",
++  "tool call": "次工具调用",
++  "tool calls": "次工具调用",
++  "Select a session from the sidebar": "从侧边栏选择一个会话",
++  "No file open": "未打开文件",
++  "System prompt is empty (tools are disabled)": "系统提示词为空（工具已禁用）",
++  "Send a message to load the system prompt": "发送一条消息以加载系统提示词",
++  "Send a message or run /session to load session info": "发送一条消息或运行 /session 以加载会话信息",
++  "Generating...": "生成中...",
++  "No sessions found": "未找到会话",
++  "Uncommitted changes. Force remove checkout?": "有未提交更改。强制移除检出？",
++  "Force": "强制",
++  "New": "新建",
++  "Thinking...": "思考中...",
++  "Loading session...": "正在加载会话...",
++  "Recall to input": "取回到输入框",
++  "No extension, prompt, or skill commands found": "未找到扩展、提示词或技能命令",
++  "Steer": "注入",
++  "Follow-up": "排队",
++  "More": "更多",
++  "Confirm": "确认",
++  "Submit": "提交",
++  "Edit from here": "从此处编辑",
++  "Conversation compacted": "对话已压缩",
++  "download full output": "下载完整输出",
++  "Loading thinking...": "正在加载思考内容...",
++  "(no summary)": "（无摘要）",
++  "(no message)": "（无消息）",
++  "No files found": "未找到文件",
++  "No changes": "无更改",
++  "Skip existing": "跳过已有",
++  "Replace": "替换",
++  "Testing model connection...": "正在测试模型连接...",
++  "connected": "已连接",
++  "configured": "已配置",
++  "click here to open the login page": "点击此处打开登录页面",
++  "Open the verification page and enter this code:": "打开验证页面并输入此代码：",
++  "+ Add provider": "+ 添加提供商",
++  "+ model": "+ 模型",
++  "Select a provider or model": "选择提供商或模型",
++  "Default": "默认",
++  "clear all": "全部清除",
++  "ENV_VAR_NAME, !shell-command, or literal key": "环境变量名、!shell 命令或字面密钥",
++  "Add Plugin": "添加插件",
++  "Add plugin": "添加插件",
++  "No plugins configured": "未配置插件",
++  "Select a package": "选择一个包",
++  "Resolved Resources": "已解析资源",
++  "Examples": "示例",
++  "Add Skill": "添加技能",
++  "Add skill": "添加技能",
++  "Select a skill": "选择一个技能",
++  "Check": "检查",
++  "Description": "描述",
++  "Prefix with": "前缀使用",
++  "to run a shell command, or use an env var name": "可运行 shell 命令，或使用环境变量名",
++  "to discover and install skills for your agent.": "发现并为你的 agent 安装技能。",
++  "file already exists": "个文件已存在",
++  "files already exist": "个文件已存在",
++  "Cancel": "取消",
++  "Loading...": "加载中...",
++  "Loading…": "加载中…",
++  "Explorer": "资源管理器",
++  "Close": "关闭",
++  "Refresh": "刷新",
++  "Send": "发送",
++  "Stop": "停止",
++  "Delete": "删除",
++  "Rename": "重命名",
++  "Remove": "移除",
++  "Disconnect": "断开连接",
++  "Plugins": "插件",
++  "Source": "源码",
++  "Skills": "技能",
++  "Name": "名称",
++  "Version": "版本",
++  "Custom": "自定义",
++  "Disabled": "已禁用",
++  "No skills found": "未找到技能",
++  "Add models via the": "通过底部的",
++  "button at the bottom": "按钮添加模型",
++
++};
++
++const dictionaries: Record<Locale, Record<string, string>> = {
++  "zh-CN": zhCN,
++  en: {},
++};
++
++let currentLocale: Locale = "zh-CN";
++
++export function getLocale(): Locale {
++  if (typeof window !== "undefined") {
++    try {
++      const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
++      if (stored === "zh-CN" || stored === "en") return stored;
++    } catch {
++      // ignore
++    }
++  }
++  return currentLocale;
++}
++
++export function setLocale(locale: Locale): void {
++  currentLocale = locale;
++  if (typeof window !== "undefined") {
++    try {
++      localStorage.setItem(STORAGE_KEY, locale);
++    } catch {
++      // ignore
++    }
++  }
++}
++
++/** Translate a UI string. Falls back to the source English key when missing. */
++export function t(key: string, vars?: Record<string, string | number>): string {
++  const locale = typeof window !== "undefined" ? getLocale() : currentLocale;
++  const dict = dictionaries[locale] ?? {};
++  let out = dict[key] ?? (locale === "en" ? key : zhCN[key] ?? key);
++  if (vars) {
++    for (const [k, v] of Object.entries(vars)) {
++      out = out.replaceAll(`{${k}}`, String(v));
++    }
++  }
++  return out;
++}
++
++/** Helper for template-like messages built at call sites. */
++export function tf(template: string, ...parts: Array<string | number>): string {
++  // Prefer exact key match first; otherwise return interpolated Chinese-aware text via t of known fragments.
++  return t(template);
++}
