@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         pi-web slash command descriptions (zh-CN)
 // @namespace    https://github.com/1731300623/pi-web-zh
-// @version      1.0.1
-// @description  Localize slash-command palette descriptions on localhost pi-web using the shared JSON dictionary. Never translates chat messages.
+// @version      1.1.0
+// @description  Localize slash-command palette descriptions on localhost pi-web. Prefers command-name keys (robust to CSS line-clamp). Does not translate chat messages.
 // @author       pi-web-zh
 // @match        http://localhost:30141/*
 // @match        http://127.0.0.1:30141/*
@@ -14,22 +14,20 @@
 (function () {
   "use strict";
 
-  /** @type {Record<string, string> | null} */
-  let byDescription = null;
+  /** @type {{ byCommandName?: Record<string,string>, byDescription?: Record<string,string> } | null} */
+  let dict = null;
 
   try {
     const raw = GM_getResourceText("SLASH_ZH");
     if (!raw) return;
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed.byDescription !== "object" || parsed.byDescription === null) {
-      return;
-    }
-    byDescription = parsed.byDescription;
+    if (!parsed || typeof parsed !== "object") return;
+    dict = parsed;
   } catch {
     return;
   }
 
-  if (!byDescription || Object.keys(byDescription).length === 0) return;
+  if (!dict) return;
 
   /**
    * ChatInput renders each slash item as:
@@ -37,7 +35,6 @@
    *     <span>/{name}</span>
    *     <span>{description}</span>
    *   </button>
-   * Only the description span is eligible for translation.
    */
 
   /**
@@ -46,12 +43,10 @@
    */
   function isSlashCommandButton(el) {
     if (!el || el.tagName !== "BUTTON") return false;
-    // Prefer direct-child spans (palette cards); fall back to nested spans.
     const spans = el.querySelectorAll(":scope > span, span");
     for (const span of spans) {
       const text = (span.textContent || "").trim();
-      // Command name leaf: "/foo" (not a free-form sentence).
-      if (text.startsWith("/") && text.length > 1 && !/\s/.test(text.slice(0, 48))) {
+      if (text.startsWith("/") && text.length > 1 && !/\s/.test(text.slice(0, 64))) {
         return true;
       }
     }
@@ -59,72 +54,78 @@
   }
 
   /**
-   * @param {string | null | undefined} value
+   * @param {string} commandName bare name without leading slash
+   * @param {string} englishDesc full description text currently shown
    * @returns {string | null}
    */
-  function lookupZh(value) {
-    if (!value || !byDescription) return null;
-    const trimmed = value.trim();
-    if (!trimmed || !Object.prototype.hasOwnProperty.call(byDescription, trimmed)) {
-      return null;
+  function lookupZh(commandName, englishDesc) {
+    if (!dict) return null;
+    const byName = dict.byCommandName;
+    if (byName && typeof byName === "object" && byName[commandName]) {
+      return byName[commandName];
     }
-    const zh = byDescription[trimmed];
-    return typeof zh === "string" && zh.length > 0 ? zh : null;
-  }
-
-  /**
-   * Replace a single text node's value when it exactly matches a dictionary key
-   * (optional surrounding whitespace preserved).
-   * @param {Text} node
-   */
-  function translateTextNode(node) {
-    const value = node.nodeValue;
-    if (!value) return;
-    const zh = lookupZh(value);
-    if (!zh) return;
-    const trimmed = value.trim();
-    if (value === trimmed) {
-      node.nodeValue = zh;
-      return;
+    const byDesc = dict.byDescription;
+    if (byDesc && typeof byDesc === "object" && englishDesc && byDesc[englishDesc]) {
+      return byDesc[englishDesc];
     }
-    const lead = value.match(/^\s*/)?.[0] ?? "";
-    const trail = value.match(/\s*$/)?.[0] ?? "";
-    if (value.slice(lead.length, value.length - trail.length) === trimmed) {
-      node.nodeValue = lead + zh + trail;
+    // Prefix match for line-clamped / truncated visible text
+    if (byDesc && englishDesc && englishDesc.length >= 12) {
+      const prefix = englishDesc.replace(/[.…]+$/u, "").trim();
+      for (const [en, zh] of Object.entries(byDesc)) {
+        if (typeof zh !== "string") continue;
+        if (en.startsWith(prefix) || prefix.startsWith(en.slice(0, Math.min(en.length, prefix.length)))) {
+          // only accept if prefix is a real start of the English key
+          if (en.startsWith(prefix) || (prefix.length >= 20 && en.startsWith(prefix.slice(0, 20)))) {
+            return zh;
+          }
+        }
+      }
     }
+    return null;
   }
 
   /**
    * @param {HTMLButtonElement} button
    */
   function translateDescriptionInButton(button) {
+    const directSpans = button.querySelectorAll(":scope > span");
+    const spans = directSpans.length > 0 ? Array.from(directSpans) : Array.from(button.querySelectorAll("span"));
+
     /** @type {Element | null} */
     let commandSpan = null;
-    const directSpans = button.querySelectorAll(":scope > span");
-    const spans = directSpans.length > 0 ? directSpans : button.querySelectorAll("span");
+    /** @type {string} */
+    let commandName = "";
 
     for (const span of spans) {
       const text = (span.textContent || "").trim();
-      if (text.startsWith("/") && text.length > 1 && !/\s/.test(text.slice(0, 48))) {
+      if (text.startsWith("/") && text.length > 1 && !/\s/.test(text.slice(0, 64))) {
         commandSpan = span;
+        commandName = text.slice(1);
         break;
       }
     }
-    if (!commandSpan) return;
+    if (!commandSpan || !commandName) return;
 
     for (const span of spans) {
       if (span === commandSpan) continue;
-      // Description spans hold a single text leaf in ChatInput.
-      for (const child of span.childNodes) {
-        if (child.nodeType === Node.TEXT_NODE) {
-          translateTextNode(/** @type {Text} */ (child));
-        }
+      const englishDesc = (span.textContent || "").trim();
+      if (!englishDesc) continue;
+      // Already Chinese?
+      if (/[\u4e00-\u9fff]/.test(englishDesc)) continue;
+
+      const zh = lookupZh(commandName, englishDesc);
+      if (!zh) continue;
+
+      // Prefer replacing the text node to keep React structure simple.
+      if (span.childNodes.length === 1 && span.firstChild && span.firstChild.nodeType === Node.TEXT_NODE) {
+        span.firstChild.nodeValue = zh;
+      } else {
+        span.textContent = zh;
       }
     }
   }
 
   /**
-   * Process an element subtree: only slash-palette command buttons.
    * @param {Node | null | undefined} root
    */
   function processRoot(root) {
@@ -134,11 +135,9 @@
       const parent = /** @type {Text} */ (root).parentElement;
       if (!parent) return;
       const button = parent.closest("button");
-      if (!button || !isSlashCommandButton(button)) return;
-      // Never touch the command-name span ("/foo").
-      const parentText = (parent.textContent || "").trim();
-      if (parentText.startsWith("/") && !/\s/.test(parentText.slice(0, 48))) return;
-      translateTextNode(/** @type {Text} */ (root));
+      if (button && isSlashCommandButton(button)) {
+        translateDescriptionInButton(/** @type {HTMLButtonElement} */ (button));
+      }
       return;
     }
 
@@ -171,11 +170,9 @@
     const roots = Array.from(pendingRoots);
     pendingRoots.clear();
     try {
-      for (const root of roots) {
-        processRoot(root);
-      }
+      for (const root of roots) processRoot(root);
     } catch {
-      // best-effort only
+      // best-effort
     }
   }
 
@@ -186,10 +183,9 @@
     if (!root) return;
     pendingRoots.add(root);
     if (debounceTimer) window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(flushPending, 80);
+    debounceTimer = window.setTimeout(flushPending, 50);
   }
 
-  // One-time scan for a palette already open at install time.
   try {
     processRoot(document.body);
   } catch {
@@ -199,13 +195,8 @@
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.type === "childList") {
-        for (const node of mutation.addedNodes) {
-          scheduleProcess(node);
-        }
-        continue;
-      }
-      if (mutation.type === "characterData" && mutation.target) {
-        // Only re-check the changed text node if it sits inside a slash button.
+        for (const node of mutation.addedNodes) scheduleProcess(node);
+      } else if (mutation.type === "characterData" && mutation.target) {
         scheduleProcess(mutation.target);
       }
     }

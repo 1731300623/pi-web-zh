@@ -17,11 +17,13 @@ export interface SlashCommandDescriptionInput {
 export interface SlashCommandDescriptionDictionary {
   bySourceName: Record<string, string>;
   byDescription: Record<string, string>;
+  /** Optional fallback keyed by command name alone (e.g. "handoff", "skill:brave-search"). */
+  byCommandName?: Record<string, string>;
 }
 
 const defaultDictionary = dictionary as SlashCommandDescriptionDictionary;
 
-/** Pure lookup: source/name override, then exact English description, then original. */
+/** Pure lookup: source/name → command name → exact English description → original. */
 export function lookupSlashCommandDescription(
   command: SlashCommandDescriptionInput,
   locale: Locale,
@@ -32,7 +34,12 @@ export function lookupSlashCommandDescription(
   if (locale === "en") return description;
 
   const sourceKey = `${command.source}/${command.name}`;
-  return dict.bySourceName[sourceKey] ?? dict.byDescription[description] ?? description;
+  return (
+    dict.bySourceName[sourceKey] ??
+    dict.byCommandName?.[command.name] ??
+    dict.byDescription[description] ??
+    description
+  );
 }
 
 /** Public helper bound to the current UI locale from getLocale(). */
