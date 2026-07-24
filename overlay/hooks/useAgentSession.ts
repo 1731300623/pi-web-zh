@@ -14,6 +14,7 @@ import { sendAgentCommand } from "@/lib/agent-client";
 import { getToolNamesForPreset, type ToolEntry } from "@/lib/tool-presets";
 import type { SessionStatsInfo } from "@/lib/pi-types";
 import { t } from "@/lib/i18n";
+import { localizeSlashCommands } from "@/lib/slash-command-i18n";
 
 export interface SessionData {
   sessionId: string;
@@ -580,7 +581,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
     setSlashCommandsLoading(true);
     try {
       const data = await sendAgentCommand<SlashCommandsResponse>(sid, { type: "get_commands" });
-      const commands = data?.commands ?? [];
+      const commands = localizeSlashCommands(data?.commands ?? []);
       setSlashCommands(commands);
       return commands;
     } catch (e) {

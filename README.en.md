@@ -20,3 +20,12 @@ Or:
 ```
 
 See [README.md](./README.md) for full Chinese documentation.
+
+## Dynamic slash-command descriptions
+
+Runtime localization for skill / extension / prompt-template slash descriptions lives in:
+
+- `overlay/lib/slash-command-descriptions.zh-CN.json` — shared dictionary (`bySourceName` then exact `byDescription`)
+- `overlay/lib/slash-command-i18n.ts` — locale-aware lookup used from `hooks/useAgentSession.ts` after `get_commands`
+
+English locale and missing dictionary entries keep the original English text. Maintenance steps, export workflow, and the optional localhost Violentmonkey userscript (`userscripts/pi-web-slash-command-zh.user.js`, description-only) are documented in the Chinese README.

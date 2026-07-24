@@ -2994,18 +2994,19 @@ index 3d131cc..758a88f 100644
                <svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
                  <line x1="2" y1="2" x2="8" y2="8" />
 diff --git a/hooks/useAgentSession.ts b/hooks/useAgentSession.ts
-index d842183..7fc6008 100644
+index d842183..c4aa140 100644
 --- a/hooks/useAgentSession.ts
 +++ b/hooks/useAgentSession.ts
-@@ -13,6 +13,7 @@ import { normalizeToolCalls } from "@/lib/normalize";
+@@ -13,6 +13,8 @@ import { normalizeToolCalls } from "@/lib/normalize";
  import { sendAgentCommand } from "@/lib/agent-client";
  import { getToolNamesForPreset, type ToolEntry } from "@/lib/tool-presets";
  import type { SessionStatsInfo } from "@/lib/pi-types";
 +import { t } from "@/lib/i18n";
++import { localizeSlashCommands } from "@/lib/slash-command-i18n";
  
  export interface SessionData {
    sessionId: string;
-@@ -177,8 +178,8 @@ type EventStreamConnectionResult = {
+@@ -177,8 +179,8 @@ type EventStreamConnectionResult = {
  class EventStreamConnectionError extends Error {
    constructor(public readonly status: Exclude<EventStreamConnectionStatus, "connected">) {
      super(status === "timeout"
@@ -3016,7 +3017,7 @@ index d842183..7fc6008 100644
      this.name = "EventStreamConnectionError";
    }
  }
-@@ -481,7 +482,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -481,7 +483,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          }
          return agentState;
        } catch (e) {
@@ -3025,7 +3026,7 @@ index d842183..7fc6008 100644
          return null;
        }
      } catch (e) {
-@@ -503,7 +504,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -503,7 +505,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        setMessages(d.context.messages);
        setEntryIds(d.context.entryIds ?? []);
      } catch (e) {
@@ -3034,7 +3035,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -515,7 +516,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -515,7 +517,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          setToolPresetState(getPresetFromTools(tools));
        }
      } catch (e) {
@@ -3043,7 +3044,12 @@ index d842183..7fc6008 100644
      }
    }, [setToolPresetState]);
  
-@@ -583,7 +584,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -579,11 +581,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+     setSlashCommandsLoading(true);
+     try {
+       const data = await sendAgentCommand<SlashCommandsResponse>(sid, { type: "get_commands" });
+-      const commands = data?.commands ?? [];
++      const commands = localizeSlashCommands(data?.commands ?? []);
        setSlashCommands(commands);
        return commands;
      } catch (e) {
@@ -3052,7 +3058,7 @@ index d842183..7fc6008 100644
        setSlashCommands([]);
        return [] as SlashCommandInfo[];
      } finally {
-@@ -660,7 +661,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -660,7 +662,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          ...response,
        });
      } catch (e) {
@@ -3061,7 +3067,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -674,7 +675,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -674,7 +676,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          data,
        });
      } catch (e) {
@@ -3070,7 +3076,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -828,7 +829,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -828,7 +830,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        if (promptRunIdRef.current !== runId) return;
        const state = data.state;
        // Mirror compaction state unconditionally: a missed compaction_end
@@ -3079,7 +3085,7 @@ index d842183..7fc6008 100644
        // (wrapper destroyed) means nothing is compacting.
        setIsCompacting(state?.isCompacting ?? false);
        setQueuedMessages(normalizeQueuedMessages(state?.queuedMessages));
-@@ -914,12 +915,12 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -914,12 +916,12 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          void finishPromptWithoutStream(sessionIdRef.current);
          break;
        case "prompt_error":
@@ -3094,7 +3100,7 @@ index d842183..7fc6008 100644
          });
          break;
        case "message_start":
-@@ -1098,7 +1099,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1098,7 +1100,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          void waitForPromptSettlement(sentSessionId, promptRunId);
        }
      } catch (e) {
@@ -3103,7 +3109,7 @@ index d842183..7fc6008 100644
        if (e instanceof EventStreamConnectionError) {
          const optimisticKey = optimisticUserMessageKeyRef.current;
          if (optimisticKey) {
-@@ -1127,7 +1128,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1127,7 +1129,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
      setBashRunning(true);
      try {
        const sid = sessionIdRef.current ?? session?.id ?? await ensureNewSession();
@@ -3112,7 +3118,7 @@ index d842183..7fc6008 100644
        await sendAgentCommand(sid, {
          type: "bash",
          command,
-@@ -1136,7 +1137,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1136,7 +1138,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        await loadSession(sid);
        promoteNewSession(1, inputText);
      } catch (e) {
@@ -3121,7 +3127,7 @@ index d842183..7fc6008 100644
        addNotice({ type: "error", message: e instanceof Error ? e.message : String(e) });
        opts.chatInputRef?.current?.insertIfEmpty(inputText);
      } finally {
-@@ -1154,14 +1155,14 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1154,14 +1156,14 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        try {
          await sendAgentCommand(sid, { type: "abort_bash" });
        } catch (e) {
@@ -3138,7 +3144,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -1180,7 +1181,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1180,7 +1182,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          onSessionForked?.(newSessionId);
        }
      } catch (e) {
@@ -3147,7 +3153,7 @@ index d842183..7fc6008 100644
      } finally {
        setForkingEntryId(null);
      }
-@@ -1215,7 +1216,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1215,7 +1217,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        try {
          await sendAgentCommand(sid, { type: "set_model", provider, modelId });
        } catch (e) {
@@ -3156,7 +3162,7 @@ index d842183..7fc6008 100644
        }
        return;
      }
-@@ -1225,7 +1226,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1225,7 +1227,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        await sendAgentCommand(sid, { type: "set_model", provider, modelId });
        setCurrentModelOverride({ provider, modelId });
      } catch (e) {
@@ -3165,7 +3171,7 @@ index d842183..7fc6008 100644
      }
    }, [isNew, setNewSessionModel]);
  
-@@ -1280,7 +1281,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1280,7 +1282,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
        if (result.error) {
          addNotice({ type: "error", message: result.error });
        } else if (result.action !== "openSessionStats") {
@@ -3174,7 +3180,7 @@ index d842183..7fc6008 100644
        }
        return result;
      };
-@@ -1288,7 +1289,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1288,7 +1290,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
      try {
        switch (commandName) {
          case "compact": {
@@ -3183,7 +3189,7 @@ index d842183..7fc6008 100644
            setIsCompacting(true);
            setCompactError(null);
            setCompactResult(null);
-@@ -1298,11 +1299,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1298,11 +1300,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
            });
            setCompactResult(readCompactResult(result, "manual"));
            if (await loadSession(sid, true)) promoteNewSession();
@@ -3197,7 +3203,7 @@ index d842183..7fc6008 100644
            await sendAgentCommand(sid, { type: "reload" });
            await Promise.all([
              loadSession(sid, false, true),
-@@ -1310,11 +1311,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1310,11 +1312,11 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
              loadSlashCommands(),
              loadModels(),
            ]);
@@ -3211,7 +3217,7 @@ index d842183..7fc6008 100644
            if (!args) return complete({ handled: true, error: "Usage: /name <name>" });
            await sendAgentCommand(sid, { type: "set_session_name", name: args });
            if (await loadSession(sid)) promoteNewSession();
-@@ -1322,7 +1323,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1322,7 +1324,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          }
  
          case "session": {
@@ -3220,7 +3226,7 @@ index d842183..7fc6008 100644
            const stats = await sendAgentCommand<SessionStatsInfo>(sid, { type: "get_session_stats" });
            if (stats) {
              setSessionStatsOverride(stats);
-@@ -1332,12 +1333,12 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1332,12 +1334,12 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          }
  
          case "copy": {
@@ -3236,7 +3242,7 @@ index d842183..7fc6008 100644
          }
  
          default:
-@@ -1365,7 +1366,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1365,7 +1367,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          ...(piImages?.length ? { images: piImages } : {}),
        });
      } catch (e) {
@@ -3245,7 +3251,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -1385,7 +1386,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1385,7 +1387,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          ...(piImages?.length ? { images: piImages } : {}),
        });
      } catch (e) {
@@ -3254,7 +3260,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -1400,7 +1401,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1400,7 +1402,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          ...(piImages?.length ? { images: piImages } : {}),
        });
      } catch (e) {
@@ -3263,7 +3269,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -1410,7 +1411,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1410,7 +1412,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
      try {
        await sendAgentCommand(sid, { type: "abort_compaction" });
      } catch (e) {
@@ -3272,7 +3278,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -1427,8 +1428,8 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1427,8 +1429,8 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
          opts.chatInputRef?.current?.prependText(texts.join("\n\n"));
        }
      } catch (e) {
@@ -3283,7 +3289,7 @@ index d842183..7fc6008 100644
      }
    }, [opts.chatInputRef, addNotice]);
  
-@@ -1440,7 +1441,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1440,7 +1442,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
      try {
        await sendAgentCommand(sid, { type: "set_thinking_level", level });
      } catch (e) {
@@ -3292,7 +3298,7 @@ index d842183..7fc6008 100644
      }
    }, []);
  
-@@ -1452,7 +1453,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
+@@ -1452,7 +1454,7 @@ export function useAgentSession(opts: UseAgentSessionOptions) {
      try {
        await sendAgentCommand(sid, { type: "set_tools", toolNames });
      } catch (e) {
@@ -3840,4 +3846,112 @@ index 0000000..4072dad
 +export function tf(template: string, ...parts: Array<string | number>): string {
 +  // Prefer exact key match first; otherwise return interpolated Chinese-aware text via t of known fragments.
 +  return t(template);
++}
+diff --git a/lib/slash-command-descriptions.zh-CN.json b/lib/slash-command-descriptions.zh-CN.json
+new file mode 100644
+index 0000000..383e627
+--- /dev/null
++++ b/lib/slash-command-descriptions.zh-CN.json
+@@ -0,0 +1,42 @@
++{
++  "bySourceName": {
++    "skill/skill:brave-search": "通过 Brave Search API 进行网页搜索与内容提取。用于查找文档、事实或任意网页内容。轻量，无需浏览器。",
++    "skill/skill:browser-tools": "通过 Chrome DevTools Protocol 进行交互式浏览器自动化。用于与网页交互、测试前端，或需要可见浏览器中的用户操作时。",
++    "skill/skill:gccli": "Google 日历 CLI：列出日历、查看/创建/更新事件，以及检查空闲时间。",
++    "skill/skill:gdcli": "Google 云端硬盘 CLI：列出、搜索、上传、下载与共享文件和文件夹。",
++    "skill/skill:gmcli": "Gmail CLI：搜索邮件、阅读会话、发送消息、管理草稿，以及处理标签/附件。",
++    "skill/skill:transcribe": "在 Apple Silicon macOS 上本地语音转文字。直接支持 wav，其他音频格式通过 ffmpeg 转换。",
++    "skill/skill:vscode": "VS Code 集成，用于查看 diff 与对比文件。在向用户展示文件差异时使用。",
++    "skill/skill:youtube-transcript": "从 YouTube 视频获取字幕，便于摘要与分析。",
++    "extension/handoff": "将会话上下文转移到新的聚焦会话",
++    "extension/preset": "切换预设配置",
++    "extension/plan": "切换计划模式（只读探索）",
++    "extension/todos": "显示当前计划待办列表",
++    "prompt/plan-exec-review": "Sol 规划 → Grok/Gemini 实现 → Sol 最终审查",
++    "prompt/scout-plan-exec-review": "Grok 侦察 → Sol 规划 → Grok/Gemini 实现 → Sol 审查",
++    "prompt/plan-only": "仅由 Sol 做需求分析与规划（不改代码）",
++    "prompt/implement-from-plan": "Grok/Gemini 执行既有计划，再由 Sol 最终审查",
++    "prompt/review-only": "由 Sol 对当前工作区变更做最终审查",
++    "prompt/frontend-exec-review": "Sol 规划 → agy Gemini 3.6 Flash 前端实现 → Sol 审查（面向 UI）"
++  },
++  "byDescription": {
++    "Web search and content extraction via Brave Search API. Use for searching documentation, facts, or any web content. Lightweight, no browser required.": "通过 Brave Search API 进行网页搜索与内容提取。用于查找文档、事实或任意网页内容。轻量，无需浏览器。",
++    "Interactive browser automation via Chrome DevTools Protocol. Use when you need to interact with web pages, test frontends, or when user interaction with a visible browser is required.": "通过 Chrome DevTools Protocol 进行交互式浏览器自动化。用于与网页交互、测试前端，或需要可见浏览器中的用户操作时。",
++    "Google Calendar CLI for listing calendars, viewing/creating/updating events, and checking availability.": "Google 日历 CLI：列出日历、查看/创建/更新事件，以及检查空闲时间。",
++    "Google Drive CLI for listing, searching, uploading, downloading, and sharing files and folders.": "Google 云端硬盘 CLI：列出、搜索、上传、下载与共享文件和文件夹。",
++    "Gmail CLI for searching emails, reading threads, sending messages, managing drafts, and handling labels/attachments.": "Gmail CLI：搜索邮件、阅读会话、发送消息、管理草稿，以及处理标签/附件。",
++    "Local speech-to-text transcription on Apple Silicon macOS. Supports wav directly and other audio formats via ffmpeg.": "在 Apple Silicon macOS 上本地语音转文字。直接支持 wav，其他音频格式通过 ffmpeg 转换。",
++    "VS Code integration for viewing diffs and comparing files. Use when showing file differences to the user.": "VS Code 集成，用于查看 diff 与对比文件。在向用户展示文件差异时使用。",
++    "Fetch transcripts from YouTube videos for summarization and analysis.": "从 YouTube 视频获取字幕，便于摘要与分析。",
++    "Transfer context to a new focused session": "将会话上下文转移到新的聚焦会话",
++    "Switch preset configuration": "切换预设配置",
++    "Toggle plan mode (read-only exploration)": "切换计划模式（只读探索）",
++    "Show current plan todo list": "显示当前计划待办列表",
++    "Sol plan → Grok/Gemini implement → Sol final review": "Sol 规划 → Grok/Gemini 实现 → Sol 最终审查",
++    "Grok scout → Sol plan → Grok/Gemini implement → Sol review": "Grok 侦察 → Sol 规划 → Grok/Gemini 实现 → Sol 审查",
++    "Sol requirements analysis and plan only (no code changes)": "仅由 Sol 做需求分析与规划（不改代码）",
++    "Grok/Gemini implement an existing plan, then Sol final review": "Grok/Gemini 执行既有计划，再由 Sol 最终审查",
++    "Sol final review of current working tree changes": "由 Sol 对当前工作区变更做最终审查",
++    "Sol plan → agy Gemini 3.6 Flash frontend implement → Sol review (UI-focused)": "Sol 规划 → agy Gemini 3.6 Flash 前端实现 → Sol 审查（面向 UI）"
++  }
++}
+diff --git a/lib/slash-command-i18n.ts b/lib/slash-command-i18n.ts
+new file mode 100644
+index 0000000..8feb041
+--- /dev/null
++++ b/lib/slash-command-i18n.ts
+@@ -0,0 +1,54 @@
++/**
++ * Locale-aware localization for dynamically loaded slash-command descriptions
++ * (extensions, prompt templates, skills). Built-in UI strings stay in lib/i18n.ts.
++ */
++
++import { getLocale, type Locale } from "./i18n";
++import dictionary from "./slash-command-descriptions.zh-CN.json";
++
++export type SlashCommandSource = "extension" | "prompt" | "skill";
++
++export interface SlashCommandDescriptionInput {
++  name: string;
++  description?: string;
++  source: SlashCommandSource;
++}
++
++export interface SlashCommandDescriptionDictionary {
++  bySourceName: Record<string, string>;
++  byDescription: Record<string, string>;
++}
++
++const defaultDictionary = dictionary as SlashCommandDescriptionDictionary;
++
++/** Pure lookup: source/name override, then exact English description, then original. */
++export function lookupSlashCommandDescription(
++  command: SlashCommandDescriptionInput,
++  locale: Locale,
++  dict: SlashCommandDescriptionDictionary = defaultDictionary,
++): string | undefined {
++  const description = command.description;
++  if (description === undefined) return undefined;
++  if (locale === "en") return description;
++
++  const sourceKey = `${command.source}/${command.name}`;
++  return dict.bySourceName[sourceKey] ?? dict.byDescription[description] ?? description;
++}
++
++/** Public helper bound to the current UI locale from getLocale(). */
++export function localizeSlashCommandDescription(
++  command: SlashCommandDescriptionInput,
++): string | undefined {
++  return lookupSlashCommandDescription(command, getLocale());
++}
++
++/** Map a get_commands array without mutating the original objects. */
++export function localizeSlashCommands<T extends SlashCommandDescriptionInput>(
++  commands: T[],
++): T[] {
++  return commands.map((command) => {
++    const description = localizeSlashCommandDescription(command);
++    if (description === command.description) return command;
++    return { ...command, description };
++  });
 +}

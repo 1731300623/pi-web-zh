@@ -21,6 +21,8 @@
     "components/SkillsConfig.tsx",
     "components/TabBar.tsx",
     "hooks/useAgentSession.ts",
-    "lib/i18n.ts"
+    "lib/i18n.ts",
+    "lib/slash-command-descriptions.zh-CN.json",
+    "lib/slash-command-i18n.ts"
   ]
 }
