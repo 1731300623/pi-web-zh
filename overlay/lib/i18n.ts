@@ -528,7 +528,7 @@ export function t(key: string, vars?: Record<string, string | number>): string {
 }
 
 /** Helper for template-like messages built at call sites. */
-export function tf(template: string, ...parts: Array<string | number>): string {
+export function tf(template: string, ..._parts: Array<string | number>): string {
   // Prefer exact key match first; otherwise return interpolated Chinese-aware text via t of known fragments.
   return t(template);
 }

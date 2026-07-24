@@ -3309,7 +3309,7 @@ index d842183..c4aa140 100644
  
 diff --git a/lib/i18n.ts b/lib/i18n.ts
 new file mode 100644
-index 0000000..4072dad
+index 0000000..7a4cef5
 --- /dev/null
 +++ b/lib/i18n.ts
 @@ -0,0 +1,534 @@
@@ -3843,7 +3843,7 @@ index 0000000..4072dad
 +}
 +
 +/** Helper for template-like messages built at call sites. */
-+export function tf(template: string, ...parts: Array<string | number>): string {
++export function tf(template: string, ..._parts: Array<string | number>): string {
 +  // Prefer exact key match first; otherwise return interpolated Chinese-aware text via t of known fragments.
 +  return t(template);
 +}
