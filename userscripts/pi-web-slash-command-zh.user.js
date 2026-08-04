@@ -1,33 +1,69 @@
 // ==UserScript==
 // @name         pi-web slash command descriptions (zh-CN)
 // @namespace    https://github.com/1731300623/pi-web-zh
-// @version      1.3.0
-// @description  Localize slash-command palette descriptions on localhost pi-web. Prefers command-name keys (robust to CSS line-clamp). Does not translate chat messages.
+// @version      1.4.0
+// @description  Localize slash-command palette descriptions on localhost pi-web. Prefers command-name keys (robust to CSS line-clamp). Does not translate chat messages. Fetches the latest dictionary live from GitHub raw on every page load (falls back to the installed @resource copy).
 // @author       pi-web-zh
 // @match        http://localhost:30141/*
 // @match        http://127.0.0.1:30141/*
 // @grant        GM_getResourceText
+// @grant        GM_xmlhttpRequest
+// @connect      raw.githubusercontent.com
 // @resource     SLASH_ZH https://raw.githubusercontent.com/1731300623/pi-web-zh/main/overlay/lib/slash-command-descriptions.zh-CN.json
+// @updateURL    https://raw.githubusercontent.com/1731300623/pi-web-zh/main/userscripts/pi-web-slash-command-zh.user.js
+// @downloadURL  https://raw.githubusercontent.com/1731300623/pi-web-zh/main/userscripts/pi-web-slash-command-zh.user.js
 // @run-at       document-idle
 // ==/UserScript==
 
 (function () {
   "use strict";
 
+  const LIVE_DICT_URL =
+    "https://raw.githubusercontent.com/1731300623/pi-web-zh/main/overlay/lib/slash-command-descriptions.zh-CN.json";
+
   /** @type {{ byCommandName?: Record<string,string>, byDescription?: Record<string,string> } | null} */
   let dict = null;
 
-  try {
-    const raw = GM_getResourceText("SLASH_ZH");
-    if (!raw) return;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return;
-    dict = parsed;
-  } catch {
-    return;
+  /** @param {string} raw @returns {Record<string,any> | null} */
+  function parseDict(raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && parsed.byCommandName) return parsed;
+    } catch {
+      /* ignore */
+    }
+    return null;
   }
 
-  if (!dict) return;
+  /** 安装时缓存的 @resource 副本（离线/拉取失败时兜底） */
+  function resourceDict() {
+    try {
+      const raw = GM_getResourceText("SLASH_ZH");
+      return raw ? parseDict(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** 每次页面加载从 GitHub raw 拉取最新字典（免去重装脚本） */
+  function fetchLiveDict() {
+    return new Promise((resolve) => {
+      try {
+        GM_xmlhttpRequest({
+          method: "GET",
+          url: LIVE_DICT_URL,
+          timeout: 8000,
+          onload: (res) => {
+            resolve(res.status >= 200 && res.status < 300 ? parseDict(res.responseText) : null);
+          },
+          onerror: () => resolve(null),
+          ontimeout: () => resolve(null),
+        });
+      } catch {
+        resolve(null);
+      }
+    });
+  }
 
   /**
    * ChatInput renders each slash item as:
@@ -186,12 +222,6 @@
     debounceTimer = window.setTimeout(flushPending, 50);
   }
 
-  try {
-    processRoot(document.body);
-  } catch {
-    // ignore
-  }
-
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.type === "childList") {
@@ -209,4 +239,16 @@
       characterData: true,
     });
   }
+
+  // 异步加载字典：运行时拉取最新 → 失败兜底 @resource 缓存 → 就绪后统一处理
+  (async () => {
+    dict = (await fetchLiveDict()) || resourceDict();
+    if (!dict) return;
+    flushPending();
+    try {
+      processRoot(document.body);
+    } catch {
+      // best-effort
+    }
+  })();
 })();

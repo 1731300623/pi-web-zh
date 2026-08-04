@@ -69,7 +69,10 @@
     "extension/ctx-embed": "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）",
     "skill/skill:scrapling-official": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染",
     "skill/skill:build-pi-extension-with-jiti-mock-test": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
-    "skill/skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题"
+    "skill/skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
+    "extension/todos:1": "显示当前计划待办列表",
+    "extension/i18n-sync": "斜杠命令 zh-CN i18n 同步：/i18n-sync [check|list] — 检测新命令并自动翻译",
+    "extension/todos:2": "显示当前 Magic Context 待办列表"
   },
   "byDescription": {
     "Web search and content extraction via Brave Search API. Use for searching documentation, facts, or any web content. Lightweight, no browser required.": "通过 Brave Search API 进行网页搜索与内容提取。用于查找文档、事实或任意网页内容。轻量，无需浏览器。",
@@ -141,7 +144,10 @@
     "Show the current Magic Context todo list": "显示当前 Magic Context 待办列表",
     "Scrape web pages using Scrapling with anti-bot bypass (like Cloudflare Turnstile), stealth headless browsing, spiders framework, adaptive scraping, and JavaScript rendering. Use when asked to scrape, crawl, or extract data from websites; web_fetch fails; the site has anti-bot protections; write Python code to scrape/crawl; or write spiders.": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染。用于抓取/爬取/提取网站数据、web_fetch 失败、站点有反爬保护、或编写 Python 抓取/爬虫脚本时",
     "Develop & test pi agent extensions (.ts in ~/.pi/agent/extensions) with jiti mock testing": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
-    "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12(含 MCP server + Agent Skill)的踩坑流程,解决 3 个版本/平台不兼容问题": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题"
+    "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12(含 MCP server + Agent Skill)的踩坑流程,解决 3 个版本/平台不兼容问题": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
+    "Show current plan todo list": "显示当前计划待办列表",
+    "Slash command zh-CN i18n sync: /i18n-sync [check|list] — detect new commands & auto-translate": "斜杠命令 zh-CN i18n 同步：/i18n-sync [check|list] — 检测新命令并自动翻译",
+    "Show the current Magic Context todo list": "显示当前 Magic Context 待办列表"
   },
   "byCommandName": {
     "brainstorm": "开始或结束只读头脑风暴模式",
@@ -210,6 +216,9 @@
     "ctx-embed": "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）",
     "skill:scrapling-official": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染",
     "skill:build-pi-extension-with-jiti-mock-test": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
-    "skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题"
+    "skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
+    "todos:1": "显示当前计划待办列表",
+    "i18n-sync": "斜杠命令 zh-CN i18n 同步：/i18n-sync [check|list] — 检测新命令并自动翻译",
+    "todos:2": "显示当前 Magic Context 待办列表"
   }
 }
