@@ -56,7 +56,20 @@
     "skill/skill:ocr-image-pdf-via-gemini-relay": "用 gemini-3.6-flash-high 多模态读取图片/扫描件 PDF（转 JPEG 分批 OCR）",
     "skill/skill:portfolio-figma-archive": "将作品集 Figma 画板格式化为事实已验证、零断链的 Obsidian 归档",
     "skill/skill:sync-pi-relay-models": "将自定义 OpenAI 兼容中转的模型列表同步进 pi 的 models.json + settings.json",
-    "skill/skill:verify-llm-maxtokens-config": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）"
+    "skill/skill:verify-llm-maxtokens-config": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）",
+    "extension/caps": "能力索引：/caps rebuild | /caps [关键词] — 浏览并激活技能/MCP/命令",
+    "extension/route": "将任务路由到最合适的能力（LLM 重排 + 关键词兜底）。/route [任务描述]",
+    "extension/ctx-aug": "用相关项目上下文增强你的提示词（sidekick）",
+    "extension/ctx-status": "显示当前 Pi 会话的 Magic Context 状态",
+    "extension/ctx-flush": "强制待处理的 Magic Context drops 在下一次调用模型时落地",
+    "extension/ctx-recomp": "从原始 Pi 会话历史重建 Magic Context compartments",
+    "extension/ctx-wrapup": "压缩较旧的 Magic Context 历史，同时保留最新消息原文",
+    "extension/ctx-session-upgrade": "将本会话升级到当前 Magic Context 历史格式并重新整理项目记忆",
+    "extension/ctx-dream": "立即为当前项目运行 Magic Context dreamer 任务",
+    "extension/ctx-embed": "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）",
+    "skill/skill:scrapling-official": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染",
+    "skill/skill:build-pi-extension-with-jiti-mock-test": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
+    "skill/skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题"
   },
   "byDescription": {
     "Web search and content extraction via Brave Search API. Use for searching documentation, facts, or any web content. Lightweight, no browser required.": "通过 Brave Search API 进行网页搜索与内容提取。用于查找文档、事实或任意网页内容。轻量，无需浏览器。",
@@ -114,7 +127,21 @@
     "Industrial design portfolio mentor — hardcore review, project coaching, and design research. Three modes (review / start / research), five-dimension scoring, behavioral design audit, taste encoding, benchmark case library, and quantified knowledge bases (CMF, ergonomics, manufacturing, design history). For physical product designers, not UI/UX.": "工业设计作品集导师——硬核评审、项目辅导与设计研究",
     "Resurrect messy, abandoned design projects into structured, restartable portfolio work. Takes scattered research, raw data, text fragments, and material images (from Obsidian vaults, Figma boards, local folders) and reorganizes them into a clean multi-file structure with clear titles, frontmatter, and bidirectional wiki-links. Includes Figma extraction, AI vision asset recognition, narrative re-framing, and weight redistribution for portfolio storytelling. For physical product / service designers building grad-school or job portfolios.": "将杂乱的设计项目整理为结构化、可重启的作品集工作",
     "Sync a custom OpenAI-compatible relay's model list into pi's models.json + settings.json (e.g. 自建api中转 at api.jiabin.xyz)": "将自定义 OpenAI 兼容中转的模型列表同步进 pi 的 models.json + settings.json",
-    "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效(对照实验法 + 流式避超时)": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）"
+    "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效(对照实验法 + 流式避超时)": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）",
+    "Capability index: /caps rebuild | /caps [query] — browse & activate skills/mcp/commands": "能力索引：/caps rebuild | /caps [关键词] — 浏览并激活技能/MCP/命令",
+    "Route a task to the best capability (LLM rerank + keyword fallback). /route [query]": "将任务路由到最合适的能力（LLM 重排 + 关键词兜底）。/route [任务描述]",
+    "Augment your prompt with relevant project context (sidekick)": "用相关项目上下文增强你的提示词（sidekick）",
+    "Show Magic Context status for the current Pi session": "显示当前 Pi 会话的 Magic Context 状态",
+    "Force pending Magic Context drops to materialize on the next provider call": "强制待处理的 Magic Context drops 在下一次调用模型时落地",
+    "Rebuild Magic Context compartments from raw Pi session history": "从原始 Pi 会话历史重建 Magic Context compartments",
+    "Compact older Magic Context history while keeping the newest messages raw": "压缩较旧的 Magic Context 历史，同时保留最新消息原文",
+    "Upgrade this session to the current Magic Context history format and re-organize project memories": "将本会话升级到当前 Magic Context 历史格式并重新整理项目记忆",
+    "Run Magic Context dreamer tasks for this project now": "立即为当前项目运行 Magic Context dreamer 任务",
+    "Embedding status, or start/pause history compartment embedding (start | pause)": "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）",
+    "Show the current Magic Context todo list": "显示当前 Magic Context 待办列表",
+    "Scrape web pages using Scrapling with anti-bot bypass (like Cloudflare Turnstile), stealth headless browsing, spiders framework, adaptive scraping, and JavaScript rendering. Use when asked to scrape, crawl, or extract data from websites; web_fetch fails; the site has anti-bot protections; write Python code to scrape/crawl; or write spiders.": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染。用于抓取/爬取/提取网站数据、web_fetch 失败、站点有反爬保护、或编写 Python 抓取/爬虫脚本时",
+    "Develop & test pi agent extensions (.ts in ~/.pi/agent/extensions) with jiti mock testing": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
+    "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12(含 MCP server + Agent Skill)的踩坑流程,解决 3 个版本/平台不兼容问题": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题"
   },
   "byCommandName": {
     "brainstorm": "开始或结束只读头脑风暴模式",
@@ -170,6 +197,19 @@
     "skill:ocr-image-pdf-via-gemini-relay": "用 gemini-3.6-flash-high 多模态读取图片/扫描件 PDF（转 JPEG 分批 OCR）",
     "skill:portfolio-figma-archive": "将作品集 Figma 画板格式化为事实已验证、零断链的 Obsidian 归档",
     "skill:sync-pi-relay-models": "将自定义 OpenAI 兼容中转的模型列表同步进 pi 的 models.json + settings.json",
-    "skill:verify-llm-maxtokens-config": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）"
+    "skill:verify-llm-maxtokens-config": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）",
+    "caps": "能力索引：/caps rebuild | /caps [关键词] — 浏览并激活技能/MCP/命令",
+    "route": "将任务路由到最合适的能力（LLM 重排 + 关键词兜底）。/route [任务描述]",
+    "ctx-aug": "用相关项目上下文增强你的提示词（sidekick）",
+    "ctx-status": "显示当前 Pi 会话的 Magic Context 状态",
+    "ctx-flush": "强制待处理的 Magic Context drops 在下一次调用模型时落地",
+    "ctx-recomp": "从原始 Pi 会话历史重建 Magic Context compartments",
+    "ctx-wrapup": "压缩较旧的 Magic Context 历史，同时保留最新消息原文",
+    "ctx-session-upgrade": "将本会话升级到当前 Magic Context 历史格式并重新整理项目记忆",
+    "ctx-dream": "立即为当前项目运行 Magic Context dreamer 任务",
+    "ctx-embed": "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）",
+    "skill:scrapling-official": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染",
+    "skill:build-pi-extension-with-jiti-mock-test": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
+    "skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题"
   }
 }

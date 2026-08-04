@@ -39,6 +39,16 @@ const BUILTIN_ZH: Record<string, string> = {
 	llama: "管理 llama.cpp 路由模型（下载/加载/卸载）",
 	grill: "切换持续追问（grill）模式——智能体在执行前先盘问你",
 	qna: "从最后一条助手消息中提取问题到编辑器（TUI + Web）",
+	caps: "能力索引：/caps rebuild | /caps [关键词] — 浏览并激活技能/MCP/命令",
+	route: "将任务路由到最合适的能力（LLM 重排 + 关键词兜底）。/route [任务描述]",
+	"ctx-aug": "用相关项目上下文增强你的提示词（sidekick）",
+	"ctx-status": "显示当前 Pi 会话的 Magic Context 状态",
+	"ctx-flush": "强制待处理的 Magic Context drops 在下一次调用模型时落地",
+	"ctx-recomp": "从原始 Pi 会话历史重建 Magic Context compartments",
+	"ctx-wrapup": "压缩较旧的 Magic Context 历史，同时保留最新消息原文",
+	"ctx-session-upgrade": "将本会话升级到当前 Magic Context 历史格式并重新整理项目记忆",
+	"ctx-dream": "立即为当前项目运行 Magic Context dreamer 任务",
+	"ctx-embed": "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）",
 };
 
 /** 技能命令中文说明（按命令名，如 skill:firecrawl） */
@@ -61,6 +71,9 @@ const SKILL_ZH: Record<string, string> = {
 	"skill:portfolio-figma-archive": "将作品集 Figma 画板格式化为事实已验证、零断链的 Obsidian 归档",
 	"skill:sync-pi-relay-models": "将自定义 OpenAI 兼容中转的模型列表同步进 pi 的 models.json + settings.json",
 	"skill:verify-llm-maxtokens-config": "验证 LLM 的 maxTokens/contextWindow 配置是否真实生效（对照实验法）",
+	"skill:scrapling-official": "用 Scrapling 抓取网页，支持反爬绕过（如 Cloudflare Turnstile）、隐身无头浏览、spider 框架、自适应抓取与 JavaScript 渲染",
+	"skill:build-pi-extension-with-jiti-mock-test": "用 jiti mock 测试开发与测试 pi 智能体扩展（~/.pi/agent/extensions 下的 .ts 文件）",
+	"skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
 };
 
 /** 完整英文描述 → 中文 */
@@ -92,6 +105,16 @@ const FULL_DESC_ZH: Array<[RegExp | string, string]> = [
 	[/^Quit\b.*/, "退出 pi"],
 	["Toggle relentless follow-up (grill) mode — agent interrogates you before acting", "切换持续追问（grill）模式——智能体在执行前先盘问你"],
 	["Extract questions from last assistant message into editor (TUI + Web)", "从最后一条助手消息中提取问题到编辑器（TUI + Web）"],
+	["Augment your prompt with relevant project context (sidekick)", "用相关项目上下文增强你的提示词（sidekick）"],
+	["Show Magic Context status for the current Pi session", "显示当前 Pi 会话的 Magic Context 状态"],
+	["Force pending Magic Context drops to materialize on the next provider call", "强制待处理的 Magic Context drops 在下一次调用模型时落地"],
+	["Rebuild Magic Context compartments from raw Pi session history", "从原始 Pi 会话历史重建 Magic Context compartments"],
+	["Compact older Magic Context history while keeping the newest messages raw", "压缩较旧的 Magic Context 历史，同时保留最新消息原文"],
+	["Upgrade this session to the current Magic Context history format and re-organize project memories", "将本会话升级到当前 Magic Context 历史格式并重新整理项目记忆"],
+	["Run Magic Context dreamer tasks for this project now", "立即为当前项目运行 Magic Context dreamer 任务"],
+	["Embedding status, or start/pause history compartment embedding (start | pause)", "嵌入状态，或启动/暂停历史 compartment 嵌入（start | pause）"],
+	["Scrape web pages using Scrapling with anti-bot bypass (like Cloudflare Turnstile), stealth headless browsing, spiders framework, adaptive scraping, and JavaScript rendering.", "用 Scrapling 抓取网页，支持反爬绕过、隐身无头浏览、spider 框架与 JS 渲染"],
+	["Develop & test pi agent extensions (.ts in ~/.pi/agent/extensions) with jiti mock testing", "用 jiti mock 测试开发与测试 pi 智能体扩展"],
 ];
 
 /** 参数补全等场景的常见提示 */
