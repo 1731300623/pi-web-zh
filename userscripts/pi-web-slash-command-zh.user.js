@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pi-web slash command descriptions (zh-CN)
 // @namespace    https://github.com/1731300623/pi-web-zh
-// @version      1.4.0
+// @version      1.4.2
 // @description  Localize slash-command palette descriptions on localhost pi-web. Prefers command-name keys (robust to CSS line-clamp). Does not translate chat messages. Fetches the latest dictionary live from GitHub raw on every page load (falls back to the installed @resource copy).
 // @author       pi-web-zh
 // @match        http://localhost:30141/*

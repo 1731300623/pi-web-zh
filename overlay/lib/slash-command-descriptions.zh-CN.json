@@ -72,7 +72,10 @@
     "skill/skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
     "extension/todos:1": "显示当前计划待办列表",
     "extension/i18n-sync": "斜杠命令 zh-CN i18n 同步：/i18n-sync [check|list] — 检测新命令并自动翻译",
-    "extension/todos:2": "显示当前 Magic Context 待办列表"
+    "extension/todos:2": "显示当前 Magic Context 待办列表",
+    "extension/permission-system": "配置 pi-permission-system 日志和 yolo-mode 行为",
+    "extension/llama": "管理 llama.cpp 路由模型",
+    "extension/sync-relay-models": "拉取自建api中转模型目录并更新 models.json + settings.json"
   },
   "byDescription": {
     "Web search and content extraction via Brave Search API. Use for searching documentation, facts, or any web content. Lightweight, no browser required.": "通过 Brave Search API 进行网页搜索与内容提取。用于查找文档、事实或任意网页内容。轻量，无需浏览器。",
@@ -147,7 +150,10 @@
     "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12(含 MCP server + Agent Skill)的踩坑流程,解决 3 个版本/平台不兼容问题": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
     "Show current plan todo list": "显示当前计划待办列表",
     "Slash command zh-CN i18n sync: /i18n-sync [check|list] — detect new commands & auto-translate": "斜杠命令 zh-CN i18n 同步：/i18n-sync [check|list] — 检测新命令并自动翻译",
-    "Show the current Magic Context todo list": "显示当前 Magic Context 待办列表"
+    "Show the current Magic Context todo list": "显示当前 Magic Context 待办列表",
+    "Configure pi-permission-system logging and yolo-mode behavior": "配置 pi-permission-system 日志和 yolo-mode 行为",
+    "Manage llama.cpp router models": "管理 llama.cpp 路由模型",
+    "拉取自建api中转模型目录并更新 models.json + settings.json": "拉取自建api中转模型目录并更新 models.json + settings.json"
   },
   "byCommandName": {
     "brainstorm": "开始或结束只读头脑风暴模式",
@@ -219,6 +225,9 @@
     "skill:install-scrapling-cachyos-py314": "在 CachyOS/Arch + Python 3.14 上安装 Scrapling 0.4.12（含 MCP server + Agent Skill）的踩坑流程，解决 3 个版本/平台不兼容问题",
     "todos:1": "显示当前计划待办列表",
     "i18n-sync": "斜杠命令 zh-CN i18n 同步：/i18n-sync [check|list] — 检测新命令并自动翻译",
-    "todos:2": "显示当前 Magic Context 待办列表"
+    "todos:2": "显示当前 Magic Context 待办列表",
+    "permission-system": "配置 pi-permission-system 日志和 yolo-mode 行为",
+    "llama": "管理 llama.cpp 路由模型",
+    "sync-relay-models": "拉取自建api中转模型目录并更新 models.json + settings.json"
   }
 }
